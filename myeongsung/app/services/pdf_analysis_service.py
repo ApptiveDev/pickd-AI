@@ -63,27 +63,34 @@ def analyze_job_pdf(file_content: bytes) -> JobPostingCreate:
     if not full_content.strip():
         raise ValueError("PDF에서 유의미한 텍스트를 추출하지 못했습니다.")
 
-    # 4. OpenAI 기반 구조화 데이터 추출
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    # 4. OpenAI 기반 구조화 데이터 추출 (정확도를 위해 gpt-4o 사용 권장)
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
     
     prompt = ChatPromptTemplate.from_messages([
         ("system", (
-            "당신은 채용 공고 분석 전문가입니다. 주어진 PDF 파싱 내용(ID 및 페이지 번호 포함)을 면밀히 분석하여 정보를 추출하세요.\n"
-            "규칙 1: 'citations' 필드에는 해당 정보의 근거가 된 'element_id', 'page', 'content'를 정확히 입력하세요.\n"
-            "규칙 2: **중요** 'citations'에 포함된 정보는 반드시 대응하는 메인 필드(예: company_name, qualifications 등)에도 동일하게 값이 채워져야 합니다.\n"
-            "규칙 3: 해당하는 정보가 명확하지 않다면 null을 사용하되, 출처가 있는 정보는 절대로 null이 되어서는 안 됩니다."
+            "당신은 대한민국 최고의 채용 공고 분석 AI 전문가입니다. 제공된 문서 데이터(ID, Page 정보 포함)를 바탕으로 구조화된 JSON 데이터를 생성하세요.\n\n"
+            "### 핵심 추출 원칙\n"
+            "1. **계층적 정확성**: '모집 부문(sections)'과 그 하위의 '자격요건(qualifications)', '우대사항(preferences)', '자소서 문항(questions)'의 관계를 명확히 유지하세요.\n"
+            "2. **데이터 무결성**: 문서에 없는 내용을 절대로 추측하여 지어내지 마세요. 정보가 없으면 해당 필드는 null로 비워둡니다.\n"
+            "3. **날짜 표준화**: 모든 날짜는 'YYYY-MM-DDTHH:MM:SS' 형식을 따르되, 시간 정보가 없으면 '00:00:00'으로 채우세요.\n"
+            "4. **표(Table) 분석**: [Table] 태그 내의 HTML 내용을 면밀히 분석하여 표에 담긴 세부 직무 및 자격 요건을 놓치지 마세요.\n"
+            "5. **출처(Citations)**: 각 정보를 추출할 때 반드시 근거가 된 `element_id`와 원문 텍스트 일부(`content`)를 기록하세요.\n\n"
+            "### 카테고리 분류 가이드\n"
+            "- Category: FULL_TIME(정규직), INTERN(인턴), EXPERIENTIAL_INTERN(체험형 인턴), CONTRACT(계약직), FREELANCER(프리랜서)\n"
+            "- Question Type: COVER_LETTER(자소서), FREE_FORM(자유양식), JOB_DESCRIPTION(직무기술서), ADDITIONAL(기타 서류)\n\n"
+            "### 사고 과정(Chain-of-Thought)\n"
+            "먼저 공고의 전체 제목과 기업명을 파악하고, 전형 일정과 모집 부문을 구분한 뒤, 각 부문별로 요구하는 세부 자격과 우대사항을 매핑하세요."
         )),
-        ("user", "다음 PDF 분석 내용을 바탕으로 채용 정보와 출처(Citations)를 추출해주세요:\n\n{content}")
+        ("user", "다음은 분석할 문서 데이터입니다. 구조에 맞게 채용 정보를 추출하고 출처를 명시해주세요:\n\n{content}")
     ])
-
     
     chain = prompt | llm.with_structured_output(JobPostingCreate)
     
     try:
-        # LangSmith에 'pipe-analy'이라는 이름으로 추적되도록 config 추가
+        # LangSmith에 'pdf-analysis-v2'이라는 이름으로 추적되도록 config 추가
         structured_result = chain.invoke(
             {"content": full_content},
-            config={"run_name": "pipe-analy"}
+            config={"run_name": "pdf-analysis-v2"}
         )
         
         # 5. 출처(Citations) 보완 (bbox 매핑 및 페이지 이동 링크 추가)

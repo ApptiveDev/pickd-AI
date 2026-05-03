@@ -1,20 +1,14 @@
 import os
+import requests
+import json
+from typing import List
+from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from app.schemas.job_dto import JobPostingCreate
 
-import requests
-
-def analyze_job_url(url: str) -> JobPostingCreate:
-    """
-    Firecrawl을 이용해 URL에서 Markdown을 추출하고,
-    LLM을 통해 구조화된 채용 공고 데이터(JobPostingCreate)로 변환합니다.
-    """
-    # 1. Firecrawl로 URL 스크래핑
-    firecrawl_api_key = os.getenv("FIRECRAWL_API_KEY")
-    if not firecrawl_api_key:
-        raise ValueError("FIRECRAWL_API_KEY 환경변수가 설정되지 않았습니다.")
-        
+def _scrape_url_multimodal(url: str, firecrawl_api_key: str) -> dict:
+    """Firecrawl을 사용하여 마크다운과 스크린샷을 동시에 획득"""
     try:
         response = requests.post(
             'https://api.firecrawl.dev/v2/scrape',
@@ -23,54 +17,97 @@ def analyze_job_url(url: str) -> JobPostingCreate:
                 'Content-Type': 'application/json'
             },
             json={
-                'url': url,
-                'formats': ['markdown']
+                'url': url, 
+                'formats': ['markdown', 'screenshot'],
+                'waitFor': 2000 # 동적 콘텐츠 로딩 대기
             },
-            timeout=30
+            timeout=60
         )
         response.raise_for_status()
-        scrape_result = response.json()
-        
-        # v2 API 응답 형식: {"success": true, "data": {"markdown": "..."}}
-        if not scrape_result.get("success"):
-            raise ValueError(f"Firecrawl API 실패: {scrape_result.get('error', '알 수 없는 오류')}")
-            
-        markdown_content = scrape_result.get("data", {}).get("markdown", "")
+        data = response.json().get("data", {})
+        return {
+            "markdown": data.get("markdown", ""),
+            "screenshot_url": data.get("screenshot", "")
+        }
     except Exception as e:
-        raise ValueError(f"Firecrawl API 호출 중 오류가 발생했습니다: {str(e)}")
-    
-    if not markdown_content:
-        raise ValueError("해당 URL에서 마크다운 텍스트를 추출하지 못했습니다.")
+        print(f"[!] 스크래핑 실패 ({url}): {e}")
+        return {"markdown": "", "screenshot_url": ""}
 
-    # 2. OpenAI 기반 구조화 데이터 추출
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+def _analyze_with_vision(image_url: str, google_api_key: str) -> JobPostingCreate:
+    """Gemini 2.0 Flash를 사용하여 공고 이미지를 시각적으로 분석"""
+    from google import genai
+    from google.genai import types
+    import PIL.Image
+    import io
     
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "당신은 채용 공고 분석 전문가입니다. 주어진 채용 공고의 마크다운 텍스트를 면밀히 분석하여, 지정된 스키마에 맞게 정보를 추출하세요. 특히 'citations' 필드에는 각 주요 정보의 근거가 된 원문 텍스트 일부를 포함해야 합니다. URL 분석이므로 페이지 번호(page)는 모두 0으로 설정하세요."),
-        ("user", "다음 채용 공고를 분석하고 출처(Citations)를 포함하여 결과를 추출해주세요:\n\n{markdown}")
-    ])
+    client = genai.Client(api_key=google_api_key)
     
-    # with_structured_output를 사용하여 Pydantic DTO 형식(citations 포함)으로 추출
-    chain = prompt | llm.with_structured_output(JobPostingCreate)
+    prompt = (
+        "제공된 채용 공고 스크린샷을 면밀히 분석하여 구조화된 데이터를 추출하세요.\n"
+        "텍스트가 이미지(JPG/PNG)나 Iframe 내에 있더라도 모두 읽어내야 합니다.\n"
+        "특히 모집 부문(sections)과 각 부문별 상세 자격요건, 우대사항을 놓치지 마세요."
+    )
     
     try:
-        # LangSmith에 'firecrawl'이라는 이름으로 추적되도록 config 추가
-        result = chain.invoke(
-            {"markdown": markdown_content},
-            config={"run_name": "firecrawl"}
+        # 이미지 다운로드
+        img_response = requests.get(image_url)
+        img_response.raise_for_status()
+        image = PIL.Image.open(io.BytesIO(img_response.content))
+
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=[image, prompt],
+            config=types.GenerateContentConfig(
+                response_mime_type='application/json',
+                response_schema=JobPostingCreate.model_json_schema(),
+                temperature=0,
+            )
         )
-        
-        # 3. 출처(Citations)에 웹 하이라이트 링크(Text Fragment) 추가
-        from urllib.parse import quote
-        
-        if result.citations:
-            for citation in result.citations:
-                # 브라우저의 'Scroll to Text Fragment' 기능 활용 (#:~:text=문구)
-                # 문구가 너무 길면 인코딩 문제가 생길 수 있으므로 적절히 처리
-                safe_text = quote(citation.content.replace("\n", " ").strip())
-                citation.source_url = f"{url}#:~:text={safe_text}"
-                
-        return result
+        return JobPostingCreate(**json.loads(response.text))
+    except Exception as e:
+        print(f"[!] 비전 분석 실패: {e}")
+        return None
+
+def analyze_job_url(url: str) -> JobPostingCreate:
+    """
+    텍스트 분석과 비전 분석을 결합한 멀티모달 채용 공고 추출
+    """
+    firecrawl_api_key = os.getenv("FIRECRAWL_API_KEY")
+    google_api_key = os.getenv("GOOGLE_API_KEY")
+    
+    if not firecrawl_api_key:
+        raise ValueError("FIRECRAWL_API_KEY가 설정되지 않았습니다.")
+
+    try:
+        # 1. 멀티모달 데이터 획득 (Markdown + Screenshot)
+        print(f"[*] 멀티모달 스크래핑 시작: {url}")
+        scrape_data = _scrape_url_multimodal(url, firecrawl_api_key)
+        markdown = scrape_data["markdown"]
+        screenshot_url = scrape_data["screenshot_url"]
+
+        # 2. 1차 텍스트 분석 (GPT-4o)
+        llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        text_prompt = ChatPromptTemplate.from_messages([
+            ("system", "당신은 채용 공고 텍스트 분석 전문가입니다. 주어진 마크다운에서 정보를 추출하세요."),
+            ("user", "{markdown}")
+        ])
+        text_chain = text_prompt | llm.with_structured_output(JobPostingCreate)
+        text_result = text_chain.invoke({"markdown": markdown})
+
+        # 3. 2차 비전 분석 (정보가 부족하거나 보강이 필요한 경우)
+        # 모집 부문(sections)이 비어있으면 비전 엔진 가동
+        if (not text_result.sections or len(text_result.sections) == 0) and screenshot_url:
+            print("[*] 텍스트 정보 부족 감지 -> 비전 엔진(Gemini 2.0 Flash) 가동")
+            vision_result = _analyze_with_vision(screenshot_url, google_api_key)
+            if vision_result:
+                # 비전 결과로 텍스트 결과 보완
+                text_result.sections = vision_result.sections
+                if vision_result.company_info:
+                    text_result.company_info = vision_result.company_info
+                print("[*] 비전 엔진을 통해 데이터를 성공적으로 보완했습니다.")
+
+        return text_result
 
     except Exception as e:
-        raise ValueError(f"LLM 데이터 추출 중 오류가 발생했습니다: {str(e)}")
+        print(f"[!] 분석 중 오류 발생: {e}")
+        raise ValueError(f"통합 분석 중 오류가 발생했습니다: {str(e)}")
