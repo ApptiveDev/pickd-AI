@@ -1,0 +1,778 @@
+{
+  "company_name": "파크시스템스(주)",
+  "notice_name": "2026 각 부문 신입/경력 수시채용",
+  "category": "FULL_TIME",
+  "employment_type": "정규직",
+  "posted_at": "2026-04-18T00:00:00",
+  "started_at": "2026-04-18T00:00:00",
+  "ended_at": "2026-07-08T23:59:00",
+  "notice_url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=53645367&view_type=list&t_ref=main&t_ref_content=major_company&t_category=relay_view#sri_section",
+  "headcount": null,
+  "region_1depth": "경기",
+  "workplace_address": "경기도 과천시 과천대로12길 150",
+  "sections": [
+    {
+      "section_name": "SW 직군",
+      "job_title": "디지털 연구소",
+      "sub_job_title": "제품 SW",
+      "responsibilities": "ㆍ장비 운영 SW Sequence 및 UI 개발 ㆍ분석 알고리즘 개발 ㆍ Vision 분석, Camera제어, Image 처리 관련 기능 개발",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력: 신입/ 경력 5년 이하",
+          "mandatory_qualification": "학력: 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "Java 또는 C++ 개발 가능자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "외국어 (영어, 중국어, 일어 등) 가능자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "OpenCV 및 상용 Library (Cognex, MIL, Halcon, eVision 등)사용 경험자",
+          "other_preferences": "컴퓨터공학/전산 관련학과 전공자, 물리/수학 관련학과 전공자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "SW 직군",
+      "job_title": "자동화 SW",
+      "sub_job_title": null,
+      "responsibilities": "ㆍPC기반 장비 운영 SW Sequence 및 UI 개발 ㆍEFEM (Indexer) 제어 및 연동 ㆍ공장 자동화 연동 및 Sequence 구현 (Secs/Gem, CIM) ㆍFDC 관련 I/O 처리",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 신입 또는 10년 이하",
+          "mandatory_qualification": "학력 : 대졸 이상 (4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "객체지향 프로그래밍에 대한 지식 보유자, C# 또는 C++ 개발 경험자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "Secs/Gem또는 EFEM 관련 지식 보유자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "장비 SW개발 경험 보유자",
+          "other_preferences": "컴퓨터공학/전산 관련학과 전공자, 물리/수학 관련학과 전공자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "SW 직군",
+      "job_title": "전자설계",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ아날로그 회로 설계 및 아트웍 ㆍ전자 보드 설계 ㆍ컨트롤러 설계",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 4년 이상",
+          "mandatory_qualification": "학력 : 대졸 이상(4년), 물리/전자 전공",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "아날로그, 디지털 회로 해석 가능자, OPAMP 활용한 회로 설계 가능자, 회로 Noise 이해 및 OPAMP Noise 분석 가능자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "PADS 사용 가능자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "SPICE 활용 가능자, C언어, 파이썬 코딩 경험",
+          "other_preferences": null
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "R&D 직군",
+      "job_title": "Advanced R&D",
+      "sub_job_title": "머신러닝 기반 데이터 분석",
+      "responsibilities": "ㆍML 기반 광학 MI(Metrology & Inspection) 솔루션 선행 연구 ㆍMI 솔루션 알고리즘 고도화 및 최적화",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 5년 이상 (관련 경력, 석박사 기간 포함)",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": "컴퓨터공학, 전자/전기, 물리, 통계 등 관련 전공자",
+          "certificate_requirement": null,
+          "language_requirement": "Python 기반 프레임워크 (PyTorch, TensorFlow, Scikit-learn 등)활용 능숙자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "반도체/디스플레이 등 제조 공정 데이터 기반 ML 모델 개발 경험자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "MLOps(Kubeflow, MLflow 등)를 활용한 모델 관리 및 배포 경험, Image Processing 및 Computer Vision 라이브러리 (OpenCV 등) 활용 경험",
+          "other_preferences": null
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "R&D 직군",
+      "job_title": "광학설계",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ광학 설계 및 실험, 평가 ㆍ광학 검사 장비 운영 및 분석",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 신입 / 경력 2년 이상",
+          "mandatory_qualification": "학력 : 석사 이상 (관련학과)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "관련 지식 및 스킬 - 머신 비전 렌즈 분석 및 활용 - 현미경 광학계 (이미징 및 결상)",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "파동광학(Fourier optics)에 대한 이해도가 높은 박사학위 소지자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "Python 또는 Matlab 경험자, 광학계 개발 및 셋업 경험자, 광학 설계 프로그램 경험자",
+          "other_preferences": null
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "R&D 직군",
+      "job_title": "System R&D",
+      "sub_job_title": "개발이관",
+      "responsibilities": "ㆍ전자 개발 자료 검토 및 개발 이관 진행 및 지원 ㆍ개발 이관에 대한 내부 프로세스 및 규정 검토 ㆍ전자 E-BOM 관리",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 무관",
+          "mandatory_qualification": "학력 : 대졸 이상(2년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": "전기/전자 전공자",
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "PADS/Auto Cad 사용 경험자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "해당 직무 근무 경험자",
+          "other_preferences": null
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "산업장비 사업부문",
+      "sub_job_title": "Product Marketing",
+      "responsibilities": "ㆍ제품 마케팅 및 전략 수립 ㆍGo-to-Market(GTM) 기획 및 실행 ㆍ프로젝트 관리 ㆍ시장 조사 및 분석 ㆍ콘텐츠 개발 및 캠페인 기획 ㆍ영업 지원 ㆍ제품 라이프사이클 관리",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 3년 ~ 7년 (PM 또는 애플리케이션 엔지니어링 경력)",
+          "mandatory_qualification": "학력 : 대졸 이상(4년), 이공계열",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "계측기술 관련 이해도 및 커뮤니케이션 역량 보유자, 부서 간 협업 프로젝트 리딩 및 관리 역량 보유자, 국내·외 출장이 가능하며 영어능력이 우수한 자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "유관 산업군 경력 보유자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "CRM 및 마케팅 자동화 도구 (Salesforce, HubSpot 등) 활용 가능한 자",
+          "other_preferences": "경영학 석사 또는 마케팅 관련 추가 학위 보유자, 제 2외국어 역량 보유자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "Global Sales",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ해외 기술 영업 & 영업지원 ㆍ고객 영업 관리, 고객 소통 ㆍ지사 관리, 지사 소통 ㆍIndustrial product sales lead case follow up ㆍ관리지역 수주 & 관리 ㆍ고객 영업 프로젝트 지원",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 3년이상",
+          "mandatory_qualification": "학력 : 대졸 이상(4년), 이공계열 우대",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "반도체/디스플레이 장비, 기술영업/영업관리 경력자, 원어민수준의 영어 가능자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "전기/전자/반도체/계측 공학 관련자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "영미권 대학 졸업자, 해외거주/유학 경험 보유자",
+          "other_preferences": "외국어 회화 우수자 ( TOPIC, TOEIC, SPEAKING )"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "연구장비 사업부문",
+      "sub_job_title": "Global Sales",
+      "responsibilities": "ㆍ담당 해외법인 영업활동 지원 및 커뮤니케이션 ㆍ본사와 해외법인 간 영업전략 및 실행계획 조율 ㆍ고객사/파트너사와의 커뮤니케이션 및 관계관리 ㆍ시장동향 및 경쟁사 분석을 통한 영업기회 발굴 ㆍ영업자료, 견적서, 계약서 등 작성 및 검토 ㆍ해외전시회, 세미나, 고객미팅 등 영업행사 지원 ㆍ내부부서와 협업하여 해외 영업활동 지원",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 계측장비 영업 경력 3년 이상",
+          "mandatory_qualification": "학력 : 학사 이상",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "해외법인/글로벌 고객과의 커뮤니케이션 능력, 비즈니스 수준 이상의 영어능력 (회화, 작문), 다양한 문화에 대한 이해 및 글로벌 마인드셋, 문서 작성 및 프레젠테이션 능력, 팀워크 및 문제 해결 능력, 해외 출장 결격 사유 없음",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "Scanning Probe Microscope 계열 장비 또는 Atomic Force Microscopy 경험",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "계측기 해외영업 경험",
+          "other_preferences": "CRM(SalesForce) 및 ERP 사용 경험, 해외 체류 또는 근무 경험"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "미래사업 개발부",
+      "sub_job_title": "전략기획",
+      "responsibilities": "ㆍ산업용 고객의 요청에 따른 주요 산업용 개발항목 분석 및 시장성 확인 ㆍ사업개발에 따른 신사업 기술 제품기획 ㆍMarket Report 및 Public Corporate Info를 활용한 Market 분석 자료 작성 ㆍ고객사, 경쟁사 등 업계 동향 대한 데이터 수집",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 무관",
+          "mandatory_qualification": "학력 : 대졸 이상(4년), 이공계열 전공",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "영어 능통자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "석사 학위 이상 보유자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "대학원 이공계 및 자연계 연구실에서의 근무 경험자, 시장조사 경력 보유자",
+          "other_preferences": "2외국어 (중국어, 일본어) 가능자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "사업개발",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ사업 타당성 분석 및 전략 수립 - 수익성 분석 (매출 추정, 원가 구조, 손익분기점 분석 등) - 투자 비용 및 리스크 검토 - 사업 구조 설계 및 실행 로드맵 수립 - 중장기 성장 전략 및 KPI 설정 ㆍ사업 실행 및 성과 관리 - 신규 프로젝트 런칭 및 운영 관리 - 성과 모니터링 및 개선 전략 수립 - 사업 확장 및 스케일업 전략 추진",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 무관",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "영어 능통자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "회계, 재무, 법무 전공자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "시장조사, 전략기획 경험 보유자",
+          "other_preferences": "2외국어 (중국어, 일본어) 가능자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "운영관리 부문",
+      "sub_job_title": "회계",
+      "responsibilities": "ㆍ월/분기/반기/연결 결산업무 ㆍ계정명세서 및 재무제표 작성 ㆍ법인세 / 부가세 신고업무 ㆍ회계 감사 수검 및 보고서 작성",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 3년 이상 ~ 8년 이하",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": "재무회계관련 경력",
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "경영학, 회계학 등 상경계열 관련 전공자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": "회계관련 자격증보유자",
+          "experience_preference": "제조업 상장사 근무 경험자",
+          "other_preferences": "영림원 ERP 사용자, 영어가능자 (Writing, Speaking)"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "재무기획",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ해외법인 재무제표 검토 ㆍ해외법인 재무제표 작성 (IFRS 기준, 본사 보고 자료) ㆍ해외법인 손익 및 원가분석 보고 ㆍ해외법인 자금계획 관리 및 보고 ㆍ기타 본사 요청 사항 대응",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 3년 이상 ~ 8년 이하 (재무회계관련 경력)",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "영어가능자 (Writing, Speaking)",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "경영학, 회계학 등 상경계열 관련 전공자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": "회계관련 자격증보유자",
+          "experience_preference": "제조업 상장사 근무 경험자",
+          "other_preferences": "해외파견 근무 경험자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "마케팅 오퍼레이션",
+      "sub_job_title": "예산 관리 및 재무 운영",
+      "responsibilities": "ㆍ캠페인별, 본사/해외지사 마케팅 커뮤니케이션 예산 및 집행 관리 ㆍ비용 처리, 인보이스 처리 및 정산 업무 ㆍ내부 재무 정책 및 결재 프로세스 준수 ㆍ예산 Forecast 및 집행 분석 리포트 작성",
+      "detailed_description": "ㆍ캠페인 성과(도달, 참여, 전환 등) 데이터 수집 및 분석 ㆍ해외 지사 간 마케팅 성과 격차 분석 및 개선 인사이트 도출 ㆍTableau 등 BI 툴 기반 성과 대시보드 운영 및 개선 ㆍ인사이트 기반 정기 리포트 작성 및 해외지사 등 이해관계자 공유 ㆍ마케팅 커뮤니케이션 오퍼레이션 프로세스 효율 및 정확도 개선 ㆍ문서 관리 및 오퍼레이션 체계 고도화",
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 3년 이상 ~ 10년 이하 (관련 경력)",
+          "mandatory_qualification": "학력 : 무관",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "예산 관리, 비용 처리, 재무 데이터 관리 경험, 마케팅 성과 데이터 분석 및 리포팅 경험, Excel 활용 능력 (데이터 분석, 보고, 예산 모니터링 등)",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "Adobe Marketo, Salesforce Marketing Cloud, Salesforce Account Engagement (Pardot) 등 마케팅 툴 경험",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "Tableau 등 BI/리포팅 툴 활용 경험",
+          "other_preferences": "영어 비즈니스 커뮤니케이션 가능자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "마케팅 자동화 스페셜리스트",
+      "sub_job_title": "캠페인 운영 (Campaign Management)",
+      "responsibilities": "ㆍ이메일, 랜딩페이지, 너처링 프로그램, 유료 광고, SNS 등 다양한 채널을 활용한 마케팅 캠페인 기획 및 실행 ㆍAdobe Marketo Engage를 활용하여 고객 중심의 캠페인 여정 (Customer Journey) 설계 및 운영, 참여도 및 전환율 개선 ㆍ캠페인 성과 향상을 위한 A/B 테스트 수행",
+      "detailed_description": "ㆍ리드 스코어링 모델 및 라이프사이클 프로그램 설계 및 최적화 ㆍ세분화(Segmentation) 및 개인화(Personalization) 전략 운영 ㆍ글로벌 법인이 Adobe Marketo Engage를 효과적으로 활용할 수 있도록 교육, 가이드, 베스트 프랙티스 제공 ㆍCRM 시스템(예 : Salesforce)과 데이터 연동 및 관리 ㆍ영업팀과 협업하여 리드 전달 프로세스 및 파이프라인 효율 개선 ㆍ시스템 연동 및 데이터 흐름 관련 이슈 해결 ㆍ캠페인 성과(오픈율, 클릭률, 전환율 등) 분석 및 인사이트 도출을 통한 마케팅 효과 개선 ㆍTableau 기반 마케팅 성과 대시보드 운영 및 최적화",
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 5년 이상 ~ 10년 이하 (관련 경력)",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "마케팅 자동화 툴 (예 : Adobe Marketo Engage, Salesforce Marketing Cloud, Salesforce Account Engagement(Pardot)) 활용 경험 3년 이상, Salesforce 등 CRM 시스템 활용 경험, 멀티 채널 캠페인 및 리드 라이프사이클 운영 경험, 영어 및 한국어 능통 (비즈니스 수준), 이메일 및 랜딩페이지 수정이 가능한 HTML/CSS 기초 지식",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "Marketo 관련 자격증 보유",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "B2B SaaS, 기술 기반 기업 또는 글로벌 마케팅 환경 경험",
+          "other_preferences": "SQL 기초 지식 보유"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "글로벌 커뮤니케이션",
+      "sub_job_title": "글로벌 커뮤니케이션 및 콘텐츠 운영",
+      "responsibilities": "ㆍ디지털 채널, 사내 커뮤니케이션 운영 지원 ㆍ콘텐츠 기획, 작성, 편집 및 데이터 분석 ㆍ콘텐츠 자산 통합 관리",
+      "detailed_description": "ㆍ글로벌 웹사이트 콘텐츠 업데이트/유지보수 ㆍ콘텐츠 개발 요청사항 진행 및 관리 ㆍ콘텐츠 품질 관리 (일관성, 정확성, 가독성) ㆍ디지털 콘텐츠 트렌드 분석 및 웹 UI/UX 개선 지원 ㆍ웹사이트 성과 측정 및 데이터 분석 ㆍ검색엔진 최적화(SEO) 업무 지원 ㆍ대외 행사(전시회, 컨퍼런스 등) 운영 관리 ㆍ글로벌 프로젝트 일정 및 진행 현황 관리 ㆍ대외 보도자료 배포, 미디어 대응 지원 및 각종 마케팅 자료 제작",
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 3년 이상 ~ 5년 이하 (관련 경력)",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "영어 능통자 (비즈니스 레벨, 원어민 수준 우대), 꼼꼼한 업무 처리 능력 및 문서 정리 역량, 멀티태스킹, 논리적 사고력, 커뮤니케이션(명확성, 유연성) 역량, 디지털 콘텐츠 및 웹 UI/UX에 대한 이해, 웹 환경에 대한 기본 지식 및 문제 해결 능력",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "언론사, PR 대행사 등 미디어 관련 업무 경험자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "유관 업무 경험자",
+          "other_preferences": "중국어, 일본어 등 제2외국어 가능자, Adobe Photoshop, InDesign 등 디자인 툴 사용 가능자, SEO, AEO, GEO 등 검색 최적화 실무 경험자, MS Office(파워포인트, 엑셀) 능숙자, 데이터 분석 및 리포팅 가능자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "일반직군",
+      "job_title": "IT",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ전산 운영 총괄 ㆍ보안 관리 및 위험 대응 ㆍ사업계획/예산/로드맵 (Why / When) 수립 ㆍ업무시스템 운영 및 고도화 (ERP/GW/메일/자산 등)",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 10년 이상",
+          "mandatory_qualification": "학력 : 대졸 이상(4년)",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "IT 운영(인프라/시스템/네트워크/보안 중 복수 영역) 총괄/리딩 경험자, 운영 프로세스 문서화 및 실행 경험자, 협력사 커뮤니케이션 및 계약/SLA 기반 운영 관리 경험자, 내부 요구사항을 조율 및 업무 구조화할 수 있는 역량",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "유관 경력 보유자",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": null,
+          "other_preferences": "MS 오피스 활용 능숙자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "Engineer 직군",
+      "job_title": "사업부문 공통",
+      "sub_job_title": "Application Engineer",
+      "responsibilities": "ㆍ장비 데모 ㆍ개발 지원 ㆍ기술지원 ㆍ장비 교육 및 외부 발표 ㆍ업무 관련 문서 작성 (보고서, 교육/발표 자료및 기타 Guide)",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 무관",
+          "mandatory_qualification": "학력 : 석사 이상, 이공계열 전공",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": "영어회화 가능자",
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "AFM 및 반도체 계측/공정 장비 사용 경험",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": "해외 학회 발표 유경험",
+          "other_preferences": "해외 출장/파견 가능자"
+        }
+      ],
+      "questions": []
+    },
+    {
+      "section_name": "Engineer 직군",
+      "job_title": "CS Engineer",
+      "sub_job_title": null,
+      "responsibilities": "ㆍ국내/해외 산업용 및 연구용 장비 Inquiry 대응 및 On Site Support ㆍVoice Of Customer List 관리 ㆍ해외 지사 Engineer Training ㆍStandard Operation Process 문서 작성 및 관리 ㆍ사내 산업용 및 연구용 장비 출하 후 설치 및 Site Acceptance Test, On site support 진행",
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "1명",
+      "qualifications": [
+        {
+          "general_qualification": "경력 : 무관",
+          "mandatory_qualification": "학력 : 대졸 이상",
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [
+        {
+          "general_preference": "반도체 관련 학과 및 반도체 지식 보유자 (물리학과 및 전자, 반도체 관련 교육이수 포함) 우대",
+          "additional_points": null,
+          "veteran_preference": null,
+          "disability_preference": null,
+          "local_talent_preference": null,
+          "certificate_preference": null,
+          "experience_preference": null,
+          "other_preferences": "영어, 제 2외국어 가능자"
+        }
+      ],
+      "questions": []
+    }
+  ],
+  "processes": [
+    {
+      "process_name": "공통 전형",
+      "application_period": "2026년 4월 18일 ~ 채용완료시",
+      "document_screen_schedule": "공고 기간 내 수시검토되며 합격자에 한해 개별 연락 드립니다.",
+      "coding_test_schedule": null,
+      "written_exam_schedule": null,
+      "interview_schedule": "1차면접 : 실무진 위주의 면접으로, 인성검사 이후 1-2주정도 기간을 두고 진행됩니다. 2차면접 : 임원진 면접으로, 1차면접 이후 1-2주정도 기간을 두고 진행됩니다. 면접 이후 채용검진이 진행됩니다.",
+      "announcement_date": null,
+      "join_date": null,
+      "other_schedules": "인성검사 : 서류합격자에 대해 3-5일간 온라인 인성검사가 진행됩니다. 검사결과는 면접을 위한 참고자료로 활용됩니다.",
+      "schedule_notes": "각 전형별 일정은 회사 내부 사정에 따라 조정될 수 있습니다."
+    }
+  ],
+  "documents": [
+    {
+      "target_type": "COMMON",
+      "apply_method": "온라인",
+      "apply_url_or_email": "https://www.saramin.co.kr/zf_user/jobs/relay/recruitin?rec_idx=53660011&t_category=non-logged_relay_view&t_content=non-logged_relay_view_list&t_ref=non-logged_relay_view&t_ref_content=SRI_050_VIEW_MIX_RCT_NONMEM&t_ref_scnid=829&dpId=&trainingStudentCode=&inner_source=saramin&inner_medium=pattern&inner_campaign=non-logged_relay_view_apply_1&inner_term=list&referNonce=",
+      "mandatory_documents": "이력서 및 자기소개서",
+      "optional_documents": "경력기술서 (해당자에 한함)",
+      "proof_documents": null,
+      "online_form_items": null,
+      "attachment_guide": null,
+      "submission_format": null,
+      "submission_notes": null
+    }
+  ],
+  "company_info": {
+    "company_introduction": null,
+    "mission": null,
+    "vision": null,
+    "ideal_candidate": null,
+    "business_overview": null,
+    "working_conditions": "근무형태 : 정규직(수습기간 3개월) 근무요일/시간 : 주 5일(월~금)/오전 9시~오후 6시 근무지역 : 경기도 과천시 지식정보타운 급여 : 회사내규에 따름 회사주소 : (13824) 경기도 과천시 과천대로12길 150",
+    "compensation": null,
+    "benefits": "유연근무제 시행, 출산휴가, 육아휴직, 경조사 지원(경조휴가/경조금), 주차비 지원, 식대지원, 직장어린이집 지원, 임직원 건강검진 지원, 단체상해보험(임직원, 배우자), 임직원 자녀 입학 축하금, 교육훈련 지원 (대학(원)비, 직무교육, 영어교육 등), 전자도서관 지원, 동호회 지원, 선택적 복리후생(복지포인트), 장기근속자 포상제도, 우수사원 포상제도, 성과급 지급"
+  },
+  "guideline": {
+    "general_notes": "입사지원 서류에 허위사실이 발견될 경우, 채용확정 이후라도 채용이 취소될 수 있습니다. 서류 합격자에 한하여 ‘개별 연락’ 드립니다.",
+    "duplicate_apply_restriction": null,
+    "false_info_warning": null,
+    "cancellation_conditions": null,
+    "recruitment_cancel_possibility": null,
+    "reserve_candidate_guide": null,
+    "contact_info": null,
+    "other_guides": "남자의 경우 병역필 또는 면제자 해외여행에 결격사유가 없는 자 직무관련분야 자격증 소지자 및 직무 경험자 우대 국가보훈대상자 및 장애인은 관련법에 의거 우대"
+  },
+  "citations": [
+    {
+      "field": "관련 기사",
+      "page": 0,
+      "content": "ㆍ과기정통부, R&D 우수전문연구사업자 7개 기업 선정 ㆍ파크시스템스 \"M&A로 원자현미경 초격차\" ㆍ파크시스템스, 경기도 과천 신사옥 착공식 개최 ㆍ파크시스템스, '한국IR대상' 코스닥 최고상 수상 ㆍ파크시스템스, 의왕 청계지구 부지 매입…R&D·생산 강화 추진",
+      "source_url": "https://www.dailian.co.kr/news/view/1533198/ https://www.hankyung.com/article/2024051364521 https://www.thebell.co.kr/free/content/ArticleView.asp?key=202309181002137640109652 https://www.fnnews.com/news/202410171720548599 https://www.digitaltoday.co.kr/news/articleView.html?idxno=572699",
+      "bbox": null,
+      "element_id": null,
+      "page_width": null,
+      "page_height": null
+    }
+  ]
+}

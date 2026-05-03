@@ -1,0 +1,417 @@
+{
+  "company_name": "한국에너지공단",
+  "notice_name": "채용형 인턴 모집",
+  "category": "INTERN",
+  "employment_type": null,
+  "posted_at": "2026-03-16T00:00:00",
+  "started_at": "2026-03-16T00:00:00",
+  "ended_at": "2026-03-25T14:00:00",
+  "notice_url": null,
+  "headcount": 57,
+  "region_1depth": "울산광역시",
+  "workplace_address": "울산광역시 중구",
+  "sections": [
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "경영·경제",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "7",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "법·행정",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "3",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "건축",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "3",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "기계",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "7",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "데이터분석",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "3",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "전기",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "13",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "전산",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "2",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "토목",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "3",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "공개 경쟁",
+      "job_title": "화공·환경",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "6",
+      "qualifications": [
+        {
+          "general_qualification": "성별, 학력, 전공, 연령 제한 없음",
+          "mandatory_qualification": "임용예정일 기준 공단 정년(만 60세) 미만인 자",
+          "eligibility_requirement": "병역의무 불이행 사실이 없는 자",
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "제한 경쟁",
+      "job_title": "사무/기술",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "4",
+      "qualifications": [
+        {
+          "general_qualification": "보훈 또는 장애인 중 어느 하나에 해당하는 자",
+          "mandatory_qualification": null,
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": null
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "제한 경쟁",
+      "job_title": "사무",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "2",
+      "qualifications": [
+        {
+          "general_qualification": "최종 학력이 ‘고등학교 졸업 또는 졸업예정’인 자",
+          "mandatory_qualification": null,
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "대학 학위 소지자 및 졸업(예정)자, 졸업유예자는 지원 불가"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    },
+    {
+      "section_name": "제한 경쟁",
+      "job_title": "기술",
+      "sub_job_title": null,
+      "responsibilities": null,
+      "detailed_description": null,
+      "workplace": null,
+      "headcount": "4",
+      "qualifications": [
+        {
+          "general_qualification": "최종 학력이 ‘고등학교 졸업 또는 졸업예정’인 자",
+          "mandatory_qualification": null,
+          "eligibility_requirement": null,
+          "education_requirement": null,
+          "major_requirement": null,
+          "certificate_requirement": null,
+          "language_requirement": null,
+          "experience_requirement": null,
+          "age_requirement": null,
+          "military_requirement": null,
+          "other_requirements": "대학 학위 소지자 및 졸업(예정)자, 졸업유예자는 지원 불가"
+        }
+      ],
+      "preferences": [],
+      "questions": []
+    }
+  ],
+  "processes": [
+    {
+      "process_name": "공개 경쟁",
+      "application_period": "2026-03-16T00:00:00 ~ 2026-03-25T14:00:00",
+      "document_screen_schedule": "2026-04-06T00:00:00",
+      "coding_test_schedule": null,
+      "written_exam_schedule": "2026-04-11T00:00:00",
+      "interview_schedule": "2026-05-06T00:00:00 ~ 2026-05-07T00:00:00",
+      "announcement_date": "2026-06-08T00:00:00",
+      "join_date": "2026-06-15T00:00:00",
+      "other_schedules": null,
+      "schedule_notes": null
+    }
+  ],
+  "documents": [
+    {
+      "target_type": "COMMON",
+      "apply_method": null,
+      "apply_url_or_email": null,
+      "mandatory_documents": null,
+      "optional_documents": null,
+      "proof_documents": null,
+      "online_form_items": null,
+      "attachment_guide": null,
+      "submission_format": null,
+      "submission_notes": null
+    }
+  ],
+  "company_info": {
+    "company_introduction": null,
+    "mission": null,
+    "vision": null,
+    "ideal_candidate": null,
+    "business_overview": null,
+    "working_conditions": "주 5일(월∼금), 1일 8시간(09:00∼18:00) 근무",
+    "compensation": "월 2,157,000원(세전기준, 중식보조비 180,000원 포함)",
+    "benefits": "4대보험 가입"
+  },
+  "guideline": {
+    "general_notes": null,
+    "duplicate_apply_restriction": null,
+    "false_info_warning": null,
+    "cancellation_conditions": null,
+    "recruitment_cancel_possibility": null,
+    "reserve_candidate_guide": null,
+    "contact_info": null,
+    "other_guides": null
+  },
+  "citations": [
+    {
+      "field": "sections",
+      "page": 2,
+      "content": "구 분 분야 직 군 직 무 (채용목표제 적용 분야) 인 원(명) 정규직 전환 후 임용직급 공개 경쟁 채용형 인턴 (일반) 사무 경영·경제 7 6급",
+      "source_url": null,
+      "bbox": null,
+      "element_id": 16,
+      "page_width": null,
+      "page_height": null
+    },
+    {
+      "field": "sections",
+      "page": 3,
+      "content": "구 분 응시자격 공통사항 ▪ 성별, 학력, 전공, 연령 제한 없음 - 단, 임용예정일 기준 공단 정년(만 60세) 미만인 자 ▪ 「병역법」 제76조에서 정한 병역의무 불이행 사실이 없는 자 (’26.6.14. 이전 전역예정자 포함) ▪ 채용확정 후 ’26.6.15. 부터 즉시 업무 종사 가능자* * 졸업, 재학, 이직절차, 군 전역 등 개인 사정에 따른 출근일 변경 불가 ▪ 공단 인사규정 제11조에 따른 결격 사유가 없는 자 별첨1",
+      "source_url": null,
+      "bbox": null,
+      "element_id": 20,
+      "page_width": null,
+      "page_height": null
+    },
+    {
+      "field": "sections",
+      "page": 4,
+      "content": "구 분 내 용 근무시간 § 주 5일(월∼금), 1일 8시간(09:00∼18:00) 근무 근무지역 § 한국에너지공단 본사(울산광역시 중구) - 근무지역은 공단 인사 운영상 필요 시 본사 외 타 지역(지역본부 등) 으로 변경될 수 있음(정규직 전환 이후 포함) - 근무지역 배치 시 사택 지원 불가 보수수준 § 월 2,157,000원(세전기준, 중식보조비 180,000원 포함) - 정규직 전환 후 보수는 공단 보수규정에 따름 복리후생 § 4대보험 가입 입문교육 § 임용일로부터 10일간(근무일 기준, 2026. 6. 15.(월) ~ 6. 26.(금)) - 본사(울산)에서 입문교육(비숙박, 대면 집체교육) 실시 예정 - 입문교육 기간 동안 숙박 및 사택 지원 불가 기타사항 § 「근로기준법」에 따라 1개월 만근 시 1일 유급휴가 부여 § 취업시험 참여시 유급휴가 부여(단, 계약기간 중 총 2일 이내)",
+      "source_url": null,
+      "bbox": null,
+      "element_id": 23,
+      "page_width": null,
+      "page_height": null
+    },
+    {
+      "field": "processes",
+      "page": 17,
+      "content": "구 분 기 간 비 고 입사지원서 접수 3. 16(월) ~ 3. 25(수) • 3. 25(수) 14:00 마감 서류전형 합격자 발표 4. 6(월) 사전 등록 필기전형 응시여부 4. 6(월) ~ 4. 8(수) • 4. 8(수) 12:00 마감 ※ 기한 내 미등록시 필기전형 응시 불가 필기전형 4. 11(토) • 장소 : 서울, 울산 각 1개소 필기전형 합격자 발표 4. 20(월) 필기시험 합격자 자기소개서 제출 4. 20(월) ~ 4. 23(목) • 4. 23(목) 12:00 마감 ※ 기한 내 미등록시 면접전형 응시 불가 면접전형 대상자 발표 및 응시여부 사전 등록 4. 29(수) ~ 4. 30(목) • 4. 30(목) 12:00 마감 ※ 기한 내 미등록시 면접전형 응시 불가 면접전형 5. 6(수) 또는 5. 7(목) • 장소 : 서울 또는 울산(본사) 면접전형 합격자 발표 5. 20(수) 증빙서류 온라인 제출 5. 20(수) ~ 5. 22(금) • 5. 22(금) 14시 마감 최종합격자 발표 6. 8(월) 임 용 6. 15(월) 채용형 인턴 근무 6. 15(월) ~ 9. 29(화) • 인턴 계약기간 : 107일",
+      "source_url": null,
+      "bbox": null,
+      "element_id": 208,
+      "page_width": null,
+      "page_height": null
+    }
+  ]
+}

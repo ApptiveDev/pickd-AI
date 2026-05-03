@@ -120,31 +120,97 @@ if "analysis_result" in st.session_state:
     with col1:
         st.subheader("📋 추출된 채용 정보")
         
-        # 필드명 매핑 (한국어: 영어)
-        field_mapping = {
-            "company_name": "기업명",
-            "job_title": "공고명",
-            "qualifications": "지원 자격",
-            "industry": "산업/분야",
-            "application_period": "지원 기간",
-            "essay_question_count": "자소서 문항 수",
-            "work_location": "근무지",
-            "preferred_qualifications": "우대 사항",
-            "extra_points": "가산점 항목",
-            "evaluation_criteria": "전형 절차",
-            "salary": "급여/연봉"
-        }
+        # 1. 최상위 공고 정보
+        st.markdown(f"### 🏢 {result.get('company_name', '기업명 없음')}")
+        st.markdown(f"#### {result.get('notice_name', '공고명 없음')}")
         
-        for eng_name, kor_name in field_mapping.items():
-            st.write(f"**{kor_name} ({eng_name})**: {result.get(eng_name, 'N/A')}")
+        st.write(f"**채용 구분**: {result.get('category', 'N/A')} | **고용 형태**: {result.get('employment_type', 'N/A')}")
+        st.write(f"**접수 기간**: {result.get('started_at', 'N/A')} ~ {result.get('ended_at', 'N/A')}")
+        st.write(f"**채용 인원**: {result.get('headcount', '0')}명 | **근무 지역**: {result.get('region_1depth', '')} {result.get('workplace_address', '')}")
+        if result.get('notice_url'):
+            st.link_button("공고 원문 링크", result['notice_url'])
             
+        st.divider()
+
+        # 2. 계층형 정보 탭으로 구성
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["🎯 모집 부문", "🗓 전형 절차", "📄 제출 서류", "🏢 기업 정보", "⚠️ 유의사항"])
+
+        # 탭 1: 모집 부문 (자격, 우대, 자소서 포함)
+        with tab1:
+            sections = result.get('sections', [])
+            if not sections:
+                st.info("모집 부문 정보가 없습니다.")
+            for i, section in enumerate(sections):
+                with st.expander(f"📌 {section.get('section_name', '부문명')} - {section.get('job_title', '직무명')}", expanded=True):
+                    st.write(f"**세부 직무**: {section.get('sub_job_title', 'N/A')} | **인원**: {section.get('headcount', 'N/A')}")
+                    st.write(f"**담당 업무**: {section.get('responsibilities', 'N/A')}")
+                    
+                    if section.get('qualifications'):
+                        st.markdown("**✅ [지원 자격]**")
+                        for q in section['qualifications']:
+                            st.write(f"- 필수: {q.get('mandatory_qualification', 'N/A')}")
+                            st.write(f"- 학력/전공: {q.get('education_requirement', '')} / {q.get('major_requirement', '')}")
+                    
+                    if section.get('preferences'):
+                        st.markdown("**⭐ [우대 사항]**")
+                        for p in section['preferences']:
+                            st.write(f"- 우대: {p.get('general_preference', 'N/A')}")
+                    
+                    if section.get('questions'):
+                        st.markdown("**📝 [자소서 문항]**")
+                        for q in section['questions']:
+                            st.info(f"Q{q.get('question_number', '?')}. {q.get('question_content', '')} ({q.get('character_limit', '제한 없음')})")
+
+        # 탭 2: 전형 절차
+        with tab2:
+            processes = result.get('processes', [])
+            if not processes:
+                st.info("전형 절차 정보가 없습니다.")
+            for p in processes:
+                st.markdown(f"**🔹 {p.get('process_name', '전형')}**")
+                st.write(f"- 서류 일정: {p.get('document_screen_schedule', 'N/A')}")
+                st.write(f"- 코테/필기: {p.get('coding_test_schedule', '')} {p.get('written_exam_schedule', '')}")
+                st.write(f"- 면접 일정: {p.get('interview_schedule', 'N/A')}")
+                st.write(f"- 합격 발표: {p.get('announcement_date', 'N/A')}")
+                st.divider()
+
+        # 탭 3: 제출 서류
+        with tab3:
+            documents = result.get('documents', [])
+            if not documents:
+                st.info("제출 서류 정보가 없습니다.")
+            for d in documents:
+                st.markdown(f"**📄 대상: {d.get('target_type', '공통')}**")
+                st.write(f"- 필수 서류: {d.get('mandatory_documents', 'N/A')}")
+                st.write(f"- 선택 서류: {d.get('optional_documents', 'N/A')}")
+                st.write(f"- 제출 형식: {d.get('submission_format', 'N/A')}")
+                st.divider()
+
+        # 탭 4: 기업 정보
+        with tab4:
+            ci = result.get('company_info', {})
+            if not ci:
+                st.info("기업 정보가 없습니다.")
+            else:
+                st.write(f"**소개**: {ci.get('company_introduction', 'N/A')}")
+                st.write(f"**인재상**: {ci.get('ideal_candidate', 'N/A')}")
+                st.write(f"**근무조건**: {ci.get('working_conditions', 'N/A')}")
+                st.write(f"**복리후생**: {ci.get('benefits', 'N/A')}")
+
+        # 탭 5: 유의사항
+        with tab5:
+            gl = result.get('guideline', {})
+            if not gl:
+                st.info("유의사항 정보가 없습니다.")
+            else:
+                st.write(f"**공통 유의사항**: {gl.get('general_notes', 'N/A')}")
+                st.write(f"**중복 지원**: {gl.get('duplicate_apply_restriction', 'N/A')}")
+                st.write(f"**합격 취소**: {gl.get('cancellation_conditions', 'N/A')}")
+
         st.divider()
         st.subheader("🔗 출처(Citations) 목록")
         for i, citation in enumerate(result.get("citations", [])):
-            # 출처 필드명도 매핑 적용
-            display_field = field_mapping.get(citation['field'], citation['field'])
-            with st.expander(f"[{i+1}] {display_field} ({citation['field']})"):
-
+            with st.expander(f"[{i+1}] 필드명: {citation['field']}"):
                 st.write(f"**내용**: {citation['content']}")
                 if citation.get("source_url"):
                     st.link_button("원본 위치 확인", citation["source_url"])

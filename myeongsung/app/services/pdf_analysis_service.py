@@ -68,20 +68,34 @@ def analyze_job_pdf(file_content: bytes) -> JobPostingCreate:
     
     prompt = ChatPromptTemplate.from_messages([
         ("system", (
-            "당신은 대한민국 최고의 채용 공고 분석 AI 전문가입니다. 제공된 문서 데이터(ID, Page 정보 포함)를 바탕으로 구조화된 JSON 데이터를 생성하세요.\n\n"
+            "당신은 대한민국 최고의 채용 공고 분석 AI 전문가입니다.\n"
+            "제공된 PDF 파싱 데이터(ID, Page 정보 포함)를 바탕으로 구조화된 JSON 데이터를 생성하세요.\n\n"
             "### 핵심 추출 원칙\n"
-            "1. **계층적 정확성**: '모집 부문(sections)'과 그 하위의 '자격요건(qualifications)', '우대사항(preferences)', '자소서 문항(questions)'의 관계를 명확히 유지하세요.\n"
-            "2. **데이터 무결성**: 문서에 없는 내용을 절대로 추측하여 지어내지 마세요. 정보가 없으면 해당 필드는 null로 비워둡니다.\n"
-            "3. **날짜 표준화**: 모든 날짜는 'YYYY-MM-DDTHH:MM:SS' 형식을 따르되, 시간 정보가 없으면 '00:00:00'으로 채우세요.\n"
-            "4. **표(Table) 분석**: [Table] 태그 내의 HTML 내용을 면밀히 분석하여 표에 담긴 세부 직무 및 자격 요건을 놓치지 마세요.\n"
-            "5. **출처(Citations)**: 각 정보를 추출할 때 반드시 근거가 된 `element_id`와 원문 텍스트 일부(`content`)를 기록하세요.\n\n"
-            "### 카테고리 분류 가이드\n"
-            "- Category: FULL_TIME(정규직), INTERN(인턴), EXPERIENTIAL_INTERN(체험형 인턴), CONTRACT(계약직), FREELANCER(프리랜서)\n"
-            "- Question Type: COVER_LETTER(자소서), FREE_FORM(자유양식), JOB_DESCRIPTION(직무기술서), ADDITIONAL(기타 서류)\n\n"
-            "### 사고 과정(Chain-of-Thought)\n"
-            "먼저 공고의 전체 제목과 기업명을 파악하고, 전형 일정과 모집 부문을 구분한 뒤, 각 부문별로 요구하는 세부 자격과 우대사항을 매핑하세요."
+            "1. **계층적 정확성**: '모집 부문(sections)' → '자격요건(qualifications)' → '우대사항(preferences)' → '자소서 문항(questions)' 관계를 정확히 유지\n"
+            "2. **데이터 무결성**: 문서에 없는 내용은 절대 추측 금지. 정보 부재 시 null\n"
+            "3. **날짜 표준화**: YYYY-MM-DDTHH:MM:SS (시간 정보 없으면 00:00:00)\n"
+            "4. **표(Table) 정밀 분석**: [Table] 태그 내의 HTML을 행(row) 단위로 분석하여 세부 직무 및 자격 요건을 각각 분리 추출\n"
+            "5. **출처(Citations)**: 각 정보를 추출할 때 반드시 근거가 된 `element_id`, `page`, 원문 텍스트 일부(`content`)를 기록\n"
+            "6. **가산점 구분**: 공통 가산점과 직무별 가산점이 있을 경우 preferences 내 additional_points에 명확히 분리 기재\n\n"
+            "### ⚠️ 필수 추출 영역 (절대 누락 금지)\n"
+            "A. **전형 절차(processes)**: '서류전형 → 필기시험 → 면접 → 최종합격' 같은 채용 단계와 각 단계별 일정을 반드시 추출하세요. "
+            "'채용절차', '전형일정', '선발과정', '전형단계' 등의 키워드를 문서에서 찾으세요.\n"
+            "B. **제출 서류(documents)**: '입사지원서', '자기소개서', '성적증명서', '자격증 사본' 등 지원자가 제출해야 하는 서류 목록을 반드시 추출하세요. "
+            "'제출서류', '구비서류', '접수방법', '지원방법' 등의 키워드를 문서에서 찾으세요.\n"
+            "C. **유의사항(guideline)**: '허위 기재 시 합격 취소', '중복 지원 불가' 등의 안내를 반드시 추출하세요.\n\n"
+            "### 카테고리 분류\n"
+            "- Category: FULL_TIME(정규직), INTERN(인턴), EXPERIENTIAL_INTERN(체험형인턴), CONTRACT(계약직), FREELANCER(프리랜서)\n"
+            "- Question Type: COVER_LETTER, FREE_FORM, JOB_DESCRIPTION, ADDITIONAL\n\n"
+            "### 사고 과정(Chain-of-Thought) — 반드시 이 순서를 따르세요\n"
+            "Step 1: 문서 전체를 훑어 기업명과 공고명을 파악한다.\n"
+            "Step 2: 접수 기간(started_at, ended_at)과 전형 일정(processes)을 정리한다.\n"
+            "Step 3: 모집 부문(sections)을 식별하고, 각 부문별 직무명·인원·업무를 기입한다.\n"
+            "Step 4: 각 부문에 해당하는 자격요건(qualifications)과 우대사항(preferences)을 매핑한다.\n"
+            "Step 5: **제출 서류(documents)를 빠짐없이 정리한다** — 필수 서류와 선택 서류를 구분.\n"
+            "Step 6: 기업 정보(company_info)와 유의사항(guideline)을 정리한다.\n"
+            "Step 7: 모든 정보에 대해 출처(citations)를 element_id와 page 번호로 기록한다."
         )),
-        ("user", "다음은 분석할 문서 데이터입니다. 구조에 맞게 채용 정보를 추출하고 출처를 명시해주세요:\n\n{content}")
+        ("user", "다음은 분석할 PDF 문서 데이터입니다. 위 사고 과정에 따라 구조화된 채용 정보를 추출하고 출처를 명시해주세요:\n\n{content}")
     ])
     
     chain = prompt | llm.with_structured_output(JobPostingCreate)
