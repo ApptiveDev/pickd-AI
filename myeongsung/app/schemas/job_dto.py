@@ -62,7 +62,6 @@ class SectionPreferenceDTO(BaseModel):
     additional_points: Optional[str] = Field(None, description="가점사항")
     veteran_preference: Optional[str] = Field(None, description="취업지원대상 우대")
     disability_preference: Optional[str] = Field(None, description="장애인 우대")
-    local_talent_preference: Optional[str] = Field(None, description="지역 인재 우대")
     certificate_preference: Optional[str] = Field(None, description="자격증 가점")
 
 class SectionQualificationDTO(BaseModel):
@@ -72,9 +71,7 @@ class SectionQualificationDTO(BaseModel):
 class NoticeSectionDTO(BaseModel):
     section_name: str = Field(..., description="모집 부문명 (예: IT 본부, 공통 부문)")
     job_title: str = Field(..., description="직무명 (예: 백엔드 개발자)")
-    sub_job_title: Optional[str] = Field(None, description="세부 직무명 (예: Java/Spring)")
-    responsibilities: Optional[str] = Field(None, description="담당 업무 (핵심 요약)")
-    detailed_description: Optional[str] = Field(None, description="세부 업무 설명")
+    responsibilities: Optional[str] = Field(None, description="담당 업무 (핵심 요약 및 상세 설명 통합)")
     workplace: Optional[str] = Field(None, description="부문별 근무지")
     headcount: Optional[str] = Field(None, description="부문별 채용 인원")
     

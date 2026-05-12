@@ -86,7 +86,8 @@ def extract_structured_data(state: PDFAnalysisState) -> PDFAnalysisState:
             "3. **표(Table) 분석**: [Table] 태그 내 HTML을 분석할 때, 각 행(Row)을 하나의 독립된 모집 부문(section)으로 간주하세요.\n"
             "4. **계층적 정확성**: '공고(Notice)' → '모집 부문(sections)' → '자격요건(qualifications)' 및 '우대사항(preferences)' 관계를 정확히 매핑하세요.\n"
             "5. **전형 절차 및 제출 서류**: 전형 단계와 일정을 processes에, 제출 서류 및 방법을 documents에 매핑하세요.\n"
-            "6. 모든 필드에 대해 element_id와 page 번호로 출처(citations)를 증명하세요."
+            "6. **직무 및 업무 내용 통합**: 세부 직무명이나 상세 업무 설명이 있다면 `job_title`과 `responsibilities`에 모두 통합하여 작성하세요.\n"
+            "7. 모든 필드에 대해 element_id와 page 번호로 출처(citations)를 증명하세요."
         )),
         ("user", "다음은 분석할 PDF 문서 데이터입니다:\n\n{content}")
     ])
