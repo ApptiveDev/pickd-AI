@@ -18,13 +18,28 @@ router = APIRouter()
 workflow = create_workflow()
 
 @router.post("/analyze/url", response_model=JobPostingCreate)
-async def analyze_url(request: UrlAnalysisRequest):
+async def analyze_url(request: UrlAnalysisRequest, response: Response, background_tasks: BackgroundTasks):
     """
-    URL을 입력받아 Firecrawl로 마크다운을 추출하고,
-    LLM을 통해 11개 필드로 구성된 구조화된 데이터를 반환합니다.
+    URL 분석 후, 백그라운드에서 정확도를 평가하고 점수를 응답 헤더에 포함하며 로그를 기록합니다.
     """
     try:
+        # 1. 분석 수행
         result = analyze_job_url(request.url)
+        
+        # 2. 신뢰도 점수를 헤더에 포함 (Spring 서버에서 확인 가능)
+        confidence_score = 0.0
+        if result.company_name: confidence_score += 0.2
+        if result.sections: confidence_score += 0.4
+        if result.ended_at: confidence_score += 0.2
+        if result.citations: confidence_score += 0.2
+        response.headers["X-Analysis-Confidence"] = str(confidence_score)
+
+        # 3. 상세 평가 백그라운드 실행 (logs/evaluation_history.jsonl에 누적)
+        # 평가를 위해서는 원본 텍스트가 필요하므로, 간단히 URL을 넘기거나 
+        # 현재는 분석 완료된 결과만이라도 로깅하도록 설정
+        from app.services.eval_service import log_evaluation
+        background_tasks.add_task(log_evaluation, result, "Source Content Hidden", request.url)
+        
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

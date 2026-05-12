@@ -124,7 +124,7 @@ def evaluate_with_llm_judge(extraction_json: str, source_text: str, case_name: s
             "- improvements에는 구체적인 개선 제안을 작성"
         )),
         ("user", (
-            f"[테스트 케이스: {case_name}]\n\n"
+            "[테스트 케이스: {case_name}]\n\n"
             "=== 원본 소스 텍스트 (상위 3000자) ===\n{source_text}\n\n"
             "=== AI 추출 결과 (JSON) ===\n{extraction_json}\n\n"
             "위 두 자료를 비교하여 평가 결과를 출력해주세요."
@@ -135,6 +135,7 @@ def evaluate_with_llm_judge(extraction_json: str, source_text: str, case_name: s
 
     result = chain.invoke(
         {
+            "case_name": case_name,
             "source_text": source_text[:3000],
             "extraction_json": extraction_json[:5000],
         },

@@ -83,6 +83,8 @@ if analysis_mode == "PDF 분석":
                 result = response.json()
                 st.session_state["analysis_result"] = result
                 st.session_state["pdf_bytes"] = uploaded_file.getvalue()
+                # 헤더에서 신뢰도 추출
+                st.session_state["confidence"] = response.headers.get("X-Analysis-Confidence", "0")
                 st.success("분석 완료!")
             else:
                 st.error(f"오류 발생: {response.text}")
@@ -94,6 +96,8 @@ elif analysis_mode == "URL 분석":
             response = requests.post(f"{api_base_url}/analyze/url", json={"url": url})
             if response.status_code == 200:
                 st.session_state["analysis_result"] = response.json()
+                # 헤더에서 신뢰도 추출
+                st.session_state["confidence"] = response.headers.get("X-Analysis-Confidence", "0")
                 st.success("분석 완료!")
             else:
                 st.error(f"오류 발생: {response.text}")
@@ -107,6 +111,8 @@ elif analysis_mode == "이미지 분석":
             if response.status_code == 200:
                 st.session_state["analysis_result"] = response.json()
                 st.session_state["image_bytes_list"] = [f.getvalue() for f in uploaded_files]
+                # 헤더에서 신뢰도 추출
+                st.session_state["confidence"] = response.headers.get("X-Analysis-Confidence", "0")
                 st.success("분석 완료!")
             else:
                 st.error(f"오류 발생: {response.text}")
@@ -119,6 +125,13 @@ if "analysis_result" in st.session_state:
     
     with col1:
         st.subheader("📋 추출된 채용 정보")
+        
+        # 신뢰도 지수 표시
+        if "confidence" in st.session_state:
+            conf = float(st.session_state["confidence"])
+            color = "green" if conf >= 0.8 else "orange" if conf >= 0.5 else "red"
+            st.markdown(f"**💡 분석 신뢰도:** :{color}[{conf*100:.0f}%]")
+            st.progress(conf)
         
         # 1. 최상위 공고 정보
         st.markdown(f"### 🏢 {result.get('company_name', '기업명 없음')}")
