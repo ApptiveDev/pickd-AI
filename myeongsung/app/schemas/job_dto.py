@@ -65,7 +65,7 @@ class SectionPreferenceDTO(BaseModel):
     certificate_preference: Optional[str] = Field(None, description="자격증 가점")
 
 class SectionQualificationDTO(BaseModel):
-    general_qualification: Optional[str] = Field(None, description="지원 자격 (일반)")
+    general_qualification: str = Field(..., description="지원 자격 (일반)")
     mandatory_qualification: Optional[str] = Field(None, description="필수 자격")
 
 class NoticeSectionDTO(BaseModel):
