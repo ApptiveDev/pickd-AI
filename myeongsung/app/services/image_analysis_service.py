@@ -26,8 +26,10 @@ def analyze_job_image(image_bytes_list: List[bytes]) -> JobPostingCreate:
         "당신은 채용 공고 분석 전문가입니다. 제공된 모든 이미지들을 순서대로 분석하여 하나의 통합된 채용 정보를 추출하세요.\n"
         "다음 필드들을 반드시 포함해야 합니다: company_name, job_title, qualifications, industry, application_period, "
         "essay_question_count, work_location, preferred_qualifications, extra_points, evaluation_criteria, salary.\n"
-        "또한 'citations' 필드에는 각 정보의 근거가 된 원문 텍스트를 포함하고, page는 이미지 순서(1부터 시작)로 기록하세요."
+        "특히 'citations' 필드의 'bbox' 좌표는 반드시 [x1, y1, x2, y2] 순서(0~1 사이의 정규화된 값)로 작성하세요.\n"
+        "x1, y1은 영역의 왼쪽 상단, x2, y2는 오른쪽 하단 좌표입니다. 가능한 한 텍스트를 정밀하게 감싸는 최소 단위의 사각형을 구하세요."
     )
+
     contents.append(prompt_text)
 
     # 이미지 바이트들을 SDK 형식으로 변환하여 추가

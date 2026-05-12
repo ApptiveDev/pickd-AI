@@ -36,4 +36,4 @@ wheels/
 
 # SQLite
 *.db
-*.sqlite3
+*.sqlite3logs/
