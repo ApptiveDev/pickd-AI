@@ -42,3 +42,4 @@ wheels/
 data/
 ai_job_extraction_api_spec.md
 tests/results/
+/*.pdf
