@@ -1,0 +1,252 @@
+{
+  "files_processed": 6,
+  "file_results": [
+    {
+      "file": "한국에너지공단.pdf",
+      "status": "SUCCESS"
+    },
+    {
+      "file": "한국수자원공사.pdf",
+      "status": "SUCCESS"
+    },
+    {
+      "file": "한국전력공사.pdf",
+      "status": "SUCCESS"
+    },
+    {
+      "file": "채용공고.pdf",
+      "status": "SUCCESS"
+    },
+    {
+      "file": "한국도로공사.pdf",
+      "status": "SUCCESS"
+    },
+    {
+      "file": "joongboo.pdf",
+      "status": "SUCCESS"
+    }
+  ],
+  "table_scores": {
+    "Notice": {
+      "record_count": 6,
+      "overall_fill_rate": 76.7,
+      "fields": {
+        "company_name": {
+          "total": 6,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "notice_name": {
+          "total": 6,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "category": {
+          "total": 6,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "employment_type": {
+          "total": 6,
+          "empty": 2,
+          "fill_rate_percent": 66.7
+        },
+        "started_at": {
+          "total": 6,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "ended_at": {
+          "total": 6,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "notice_url": {
+          "total": 6,
+          "empty": 6,
+          "fill_rate_percent": 0.0
+        },
+        "headcount": {
+          "total": 6,
+          "empty": 1,
+          "fill_rate_percent": 83.3
+        },
+        "region_1depth": {
+          "total": 6,
+          "empty": 1,
+          "fill_rate_percent": 83.3
+        },
+        "workplace_address": {
+          "total": 6,
+          "empty": 4,
+          "fill_rate_percent": 33.3
+        }
+      }
+    },
+    "Sections": {
+      "record_count": 32,
+      "overall_fill_rate": 51.3,
+      "fields": {
+        "section_name": {
+          "total": 32,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "job_title": {
+          "total": 32,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "sub_job_title": {
+          "total": 32,
+          "empty": 31,
+          "fill_rate_percent": 3.1
+        },
+        "responsibilities": {
+          "total": 32,
+          "empty": 23,
+          "fill_rate_percent": 28.1
+        },
+        "detailed_description": {
+          "total": 32,
+          "empty": 31,
+          "fill_rate_percent": 3.1
+        },
+        "workplace": {
+          "total": 32,
+          "empty": 24,
+          "fill_rate_percent": 25.0
+        },
+        "headcount": {
+          "total": 32,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        }
+      }
+    },
+    "Qualifications": {
+      "record_count": 32,
+      "overall_fill_rate": 71.9,
+      "fields": {
+        "general_qualification": {
+          "total": 32,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "mandatory_qualification": {
+          "total": 32,
+          "empty": 18,
+          "fill_rate_percent": 43.8
+        }
+      }
+    },
+    "Preferences": {
+      "record_count": 32,
+      "overall_fill_rate": 44.3,
+      "fields": {
+        "general_preference": {
+          "total": 32,
+          "empty": 18,
+          "fill_rate_percent": 43.8
+        },
+        "additional_points": {
+          "total": 32,
+          "empty": 15,
+          "fill_rate_percent": 53.1
+        },
+        "veteran_preference": {
+          "total": 32,
+          "empty": 11,
+          "fill_rate_percent": 65.6
+        },
+        "disability_preference": {
+          "total": 32,
+          "empty": 11,
+          "fill_rate_percent": 65.6
+        },
+        "local_talent_preference": {
+          "total": 32,
+          "empty": 32,
+          "fill_rate_percent": 0.0
+        },
+        "certificate_preference": {
+          "total": 32,
+          "empty": 20,
+          "fill_rate_percent": 37.5
+        }
+      }
+    },
+    "Processes": {
+      "record_count": 17,
+      "overall_fill_rate": 45.4,
+      "fields": {
+        "process_name": {
+          "total": 17,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "document_screen_schedule": {
+          "total": 17,
+          "empty": 11,
+          "fill_rate_percent": 35.3
+        },
+        "written_exam_schedule": {
+          "total": 17,
+          "empty": 13,
+          "fill_rate_percent": 23.5
+        },
+        "interview_schedule": {
+          "total": 17,
+          "empty": 11,
+          "fill_rate_percent": 35.3
+        },
+        "join_date": {
+          "total": 17,
+          "empty": 12,
+          "fill_rate_percent": 29.4
+        },
+        "application_period": {
+          "total": 17,
+          "empty": 11,
+          "fill_rate_percent": 35.3
+        },
+        "schedule_notes": {
+          "total": 17,
+          "empty": 7,
+          "fill_rate_percent": 58.8
+        }
+      }
+    },
+    "Documents": {
+      "record_count": 6,
+      "overall_fill_rate": 70.0,
+      "fields": {
+        "mandatory_documents": {
+          "total": 6,
+          "empty": 0,
+          "fill_rate_percent": 100.0
+        },
+        "proof_documents": {
+          "total": 6,
+          "empty": 1,
+          "fill_rate_percent": 83.3
+        },
+        "apply_method": {
+          "total": 6,
+          "empty": 1,
+          "fill_rate_percent": 83.3
+        },
+        "apply_url_or_email": {
+          "total": 6,
+          "empty": 5,
+          "fill_rate_percent": 16.7
+        },
+        "submission_notes": {
+          "total": 6,
+          "empty": 2,
+          "fill_rate_percent": 66.7
+        }
+      }
+    }
+  }
+}
