@@ -32,3 +32,25 @@ class PlacementResult(BaseModel):
 class PlacementResponse(BaseModel):
     placements: List[PlacementResult]
     errors: List[str] = []
+
+# ── 자소서 기반 경험 추출 스키마 ──────────────────────────────────────
+class ExtractedExperience(BaseModel):
+    experience_name: str = Field(..., description="경험명 (예: 경식이 AI 전화 서비스 기획)")
+    experience_type: str = Field(..., description="경험 유형 (예: 프로젝트, 인턴, 동아리, 창업, 해커톤 등)")
+    organization: Optional[str] = Field(None, description="기관/소속")
+    period: Optional[str] = Field(None, description="기간")
+    my_role: str = Field(..., description="나의 역할 (Task)")
+    
+    # STAR + L
+    situation: str = Field(..., description="[S] 문제상황")
+    action: str = Field(..., description="[A] 주요 행동")
+    result: str = Field(..., description="[R] 결과/성과")
+    learnings: Optional[str] = Field(None, description="배운 점")
+    
+    core_competencies: List[str] = Field(..., description="핵심 역량 태그 (예: 문제해결, 기획력 등)")
+    applicable_questions: List[str] = Field(..., description="활용 가능 문항 (예: 문제해결 경험, 도전 경험 등)")
+    source_text: str = Field(..., description="원문 출처 (추출의 근거가 된 자소서 원본 일부)")
+    status: str = Field(default="미확인", description="상태 (미확인, 저장완료, 삭제 등)")
+
+class ExperienceExtractionResponse(BaseModel):
+    experiences: List[ExtractedExperience] = Field(..., description="추출된 경험 후보 목록")

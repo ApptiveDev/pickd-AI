@@ -77,8 +77,39 @@ async def analyze_image(files: List[UploadFile] = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/analyze-and-place", response_model=PlacementResponse)
+from app.schemas.resume_dto import ExperienceExtractionResponse
+from app.services.experience_extraction_service import extract_experiences_from_text, extract_experiences_from_url, extract_experiences_from_pdf
 
+@router.post("/extract-experiences", response_model=ExperienceExtractionResponse)
+async def extract_experiences(
+    file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일"),
+    url: Optional[str] = Form(None, description="자소서 웹페이지 URL"),
+    text: Optional[str] = Form(None, description="자소서 텍스트 원문")
+):
+    """
+    자소서 원문(PDF, URL, 텍스트 중 하나)을 입력받아, 내재된 경험들을 STAR 포맷으로 구조화하여 추출합니다.
+    """
+    if not file and not (url and url.strip()) and not (text and text.strip()):
+        raise HTTPException(
+            status_code=400,
+            detail="file (업로드 파일), url, text 중 최소 하나는 제공되어야 합니다."
+        )
+
+    try:
+        if file and file.filename:
+            file_content = await file.read()
+            if file.filename.lower().endswith(".pdf"):
+                return extract_experiences_from_pdf(file_content)
+            else:
+                return extract_experiences_from_text(file_content.decode("utf-8"))
+        elif url and url.strip():
+            return extract_experiences_from_url(url.strip())
+        elif text and text.strip():
+            return extract_experiences_from_text(text.strip())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/analyze-and-place", response_model=PlacementResponse)
 async def analyze_and_place(
     background_tasks: BackgroundTasks,
     jd_pdf: Optional[UploadFile] = File(None, description="채용공고 원문 PDF 파일 (업스테이지 파싱용)"),
