@@ -39,7 +39,18 @@ def extract_experiences_from_text(text: str) -> ExperienceExtractionResponse:
     chain = prompt | llm.with_structured_output(ExperienceExtractionResponse)
     
     try:
-        result = chain.invoke({"text": text}, config={"run_name": "experience-extraction"})
+        result = chain.invoke(
+            {"text": text},
+            config={
+                "run_name": "experience-extraction",
+                "tags": ["experience-extraction", "cover-letter", "ncs-public"],
+                "metadata": {
+                    "model": "gpt-4o",
+                    "extraction_format": "STAR+L",
+                    "project": "pickd"
+                }
+            }
+        )
         return result
     except Exception as e:
         raise ValueError(f"경험 추출 중 오류가 발생했습니다: {str(e)}")
