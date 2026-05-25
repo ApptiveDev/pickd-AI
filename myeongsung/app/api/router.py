@@ -98,13 +98,16 @@ async def analyze_image(files: List[UploadFile] = File(...)):
 
 @router.post("/extract-experiences", response_model=ExperienceExtractionResponse)
 async def extract_experiences(
-    file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일"),
-    url: Optional[str] = Form(None, description="자소서 웹페이지 URL"),
-    text: Optional[str] = Form(None, description="자소서 텍스트 원문"),
+    file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일 (file, url, text 중 단 하나만 입력해도 됨)"),
+    url: Optional[str] = Form(None, description="자소서 웹페이지 URL (file, url, text 중 단 하나만 입력해도 됨)"),
+    text: Optional[str] = Form(None, description="자소서 텍스트 원문 (file, url, text 중 단 하나만 입력해도 됨)"),
 ):
     """
     자소서 원문(PDF, URL, 텍스트 중 하나)을 입력받아,
     내재된 경험들을 STAR 포맷으로 구조화하여 추출합니다.
+
+    **입력 소스 필수 조건**:
+    `file`, `url`, `text` 중 **단 하나만 입력해도 정상적으로 작동**하며, 최소 1개는 반드시 제공되어야 합니다.
     """
     if not file and not (url and url.strip()) and not (text and text.strip()):
         raise HTTPException(
@@ -127,12 +130,15 @@ async def extract_experiences(
 
 @router.post("/extract-experiences/step1", response_model=Step1ExtractionResponse)
 async def extract_experiences_step1(
-    file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일"),
-    url: Optional[str] = Form(None, description="자소서 웹페이지 URL"),
-    text: Optional[str] = Form(None, description="자소서 텍스트 원문"),
+    file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일 (file, url, text 중 단 하나만 입력해도 됨)"),
+    url: Optional[str] = Form(None, description="자소서 웹페이지 URL (file, url, text 중 단 하나만 입력해도 됨)"),
+    text: Optional[str] = Form(None, description="자소서 텍스트 원문 (file, url, text 중 단 하나만 입력해도 됨)"),
 ):
     """
     자소서 원문을 입력받아, 1차 경험 목록(상세 서술형/스펙 증빙형 대분류 및 소분류, 경험명)만 추출합니다.
+
+    **입력 소스 필수 조건**:
+    `file`, `url`, `text` 중 **단 하나만 입력해도 정상적으로 작동**하며, 최소 1개는 반드시 제공되어야 합니다.
     """
     if not file and not (url and url.strip()) and not (text and text.strip()):
         raise HTTPException(
@@ -155,13 +161,17 @@ async def extract_experiences_step1(
 
 @router.post("/extract-experiences/step2", response_model=Step2ExtractionResponse)
 async def extract_experiences_step2(
-    file: Optional[UploadFile] = File(None, description="자소서/포트폴리오 원문 PDF 파일"),
-    url: Optional[str] = Form(None, description="자소서/포트폴리오 웹페이지 URL"),
-    text: Optional[str] = Form(None, description="자소서/포트폴리오 텍스트 원문"),
+    file: Optional[UploadFile] = File(None, description="자소서/포트폴리오 원문 PDF 파일 (원문 중 단 하나만 입력해도 됨)"),
+    url: Optional[str] = Form(None, description="자소서/포트폴리오 웹페이지 URL (원문 중 단 하나만 입력해도 됨)"),
+    text: Optional[str] = Form(None, description="자소서/포트폴리오 텍스트 원문 (원문 중 단 하나만 입력해도 됨)"),
     selected_experiences: str = Form(..., description="1차 추출에서 사용자가 남긴 경험 리스트 (JSON 문자열)"),
 ):
     """
     원문과 사용자가 선택한 1차 경험 목록을 받아, 각 경험의 소분류에 맞는 상세 정보(basic_info)를 추출합니다.
+
+    **입력 소스 필수 조건**:
+    `file`, `url`, `text` 중 **단 하나만 입력해도 정상적으로 작동**하며, 최소 1개는 필수로 제공되어야 합니다.
+    단, `selected_experiences` 파라미터는 반드시 함께 제공되어야 합니다.
     """
     if not file and not (url and url.strip()) and not (text and text.strip()):
         raise HTTPException(
