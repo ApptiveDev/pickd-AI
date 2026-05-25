@@ -145,6 +145,10 @@ BasicInfoUnion = Union[
     LanguageInfo, CertificateInfo, AwardInfo, CourseInfo, EducationInfo
 ]
 
+class TaggedSentence(BaseModel):
+    tag: str = Field(..., description="문장에 부여된 유일한 태그 (나의 역할, 문제 상황, 실행 과정, 성과, 수치 성과, 배운 점, 직무 연결성, 협업 방식, 일반 문장 중 1개)")
+    sentence: str = Field(..., description="경험 본문의 한 줄 (문장)")
+
 class Step2ExtractedExperience(BaseModel):
     experience_name: str = Field(..., description="경험명")
     experience_group: str = Field(..., description="경험 대분류 (상세 서술형/스펙·증빙형)")
@@ -163,6 +167,8 @@ class Step2ExtractedExperience(BaseModel):
     
     basic_info: BasicInfoUnion = Field(..., description="유형별 기본 필드")
     
+    experience_content: str = Field(default="", description="경험 본문 전체 (단, 스펙·증빙형은 전체 나열이 아닌 해당 경험 내용만 추출)")
+    tagged_body_text: List[TaggedSentence] = Field(default=[], description="경험 본문을 한 줄씩 저장하고 태깅한 리스트")
     document_editor_content: str = Field(default="", description="문서형 에디터 본문")
     related_links: List[str] = Field(default=[], description="관련 링크")
     attachments: List[str] = Field(default=[], description="첨부파일")
