@@ -1,98 +1,115 @@
+"""
+Resume Strategist API — 라우터 (Controller 레이어)
+
+각 엔드포인트는 요청을 수신하고 서비스 레이어에 위임한 뒤 응답을 반환합니다.
+비즈니스 로직은 services/ 하위 모듈에서 처리합니다.
+"""
+
+import json
+from typing import Optional, List
+
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks, Response
 from pydantic import ValidationError
-import json
-import uuid
-from typing import Optional
 
-from app.schemas.resume_dto import ExperienceInput, PlacementResponse
-from app.services.resume_service import create_workflow
+from app.schemas.job_dto import JobPostingCreate, UrlAnalysisRequest
+from app.schemas.resume_dto import ExperienceExtractionResponse, PlacementResponse, Step1ExtractionResponse, ExperienceSummary, Step2ExtractionResponse
 
-from app.schemas.job_dto import UrlAnalysisRequest, JobPostingCreate
+from app.services.resume_service import create_workflow, parse_and_validate_experiences
 from app.services.job_analysis_service import analyze_job_url
 from app.services.pdf_analysis_service import analyze_job_pdf
 from app.services.image_analysis_service import analyze_job_image
+from app.services.experience_extraction_service import (
+    extract_experiences_from_text,
+    extract_experiences_from_url,
+    extract_experiences_from_pdf,
+    extract_step1_from_text,
+    extract_step1_from_url,
+    extract_step1_from_pdf,
+    extract_step2_from_text,
+    extract_step2_from_url,
+    extract_step2_from_pdf,
+)
+from app.services.eval_service import log_evaluation
+
 
 router = APIRouter()
-
-
 workflow = create_workflow()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 채용공고 분석 엔드포인트
+# ──────────────────────────────────────────────────────────────────────────────
 
 @router.post("/analyze/url", response_model=JobPostingCreate)
 async def analyze_url(request: UrlAnalysisRequest, response: Response, background_tasks: BackgroundTasks):
     """
-    URL 분석 후, 백그라운드에서 정확도를 평가하고 점수를 응답 헤더에 포함하며 로그를 기록합니다.
+    URL을 입력받아 채용공고를 멀티모달(텍스트 + 비전) 방식으로 분석합니다.
+    분석 완료 후 백그라운드에서 정확도를 평가하고, 응답 헤더에 신뢰도 점수를 포함합니다.
     """
     try:
-        # 1. 분석 수행
         result = analyze_job_url(request.url)
-        
-        # 2. 신뢰도 점수를 헤더에 포함 (Spring 서버에서 확인 가능)
-        confidence_score = 0.0
-        if result.company_name: confidence_score += 0.2
-        if result.sections: confidence_score += 0.4
-        if result.ended_at: confidence_score += 0.2
-        if result.citations: confidence_score += 0.2
+
+        # 신뢰도 점수 계산 후 헤더에 포함 (Spring 서버에서 확인 가능)
+        confidence_score = sum([
+            0.2 if result.company_name else 0.0,
+            0.4 if result.sections else 0.0,
+            0.2 if result.ended_at else 0.0,
+            0.2 if result.citations else 0.0,
+        ])
         response.headers["X-Analysis-Confidence"] = str(confidence_score)
 
-        # 3. 상세 평가 백그라운드 실행 (logs/evaluation_history.jsonl에 누적)
-        # 평가를 위해서는 원본 텍스트가 필요하므로, 간단히 URL을 넘기거나 
-        # 현재는 분석 완료된 결과만이라도 로깅하도록 설정
-        from app.services.eval_service import log_evaluation
+        # 백그라운드 평가 로깅 (logs/evaluation_history.jsonl에 누적)
         background_tasks.add_task(log_evaluation, result, "Source Content Hidden", request.url)
-        
+
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/analyze/pdf", response_model=JobPostingCreate)
 async def analyze_pdf(file: UploadFile = File(...)):
     """
-    PDF 파일을 업로드받아 Azure Document Intelligence로 분석하고,
+    채용공고 PDF 파일을 업로드받아 Upstage Document AI로 파싱하고,
     LLM을 통해 11개 필드로 구성된 구조화된 데이터를 반환합니다.
     """
     try:
         file_content = await file.read()
-        result = analyze_job_pdf(file_content)
-        return result
+        return analyze_job_pdf(file_content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-from typing import Optional, List
 
 @router.post("/analyze/image", response_model=JobPostingCreate)
 async def analyze_image(files: List[UploadFile] = File(...)):
     """
-    여러 장의 이미지 파일(PNG, JPG 등)을 업로드받아 Gemini 1.5 Flash로 통합 분석하고,
+    여러 장의 채용공고 이미지(PNG, JPG 등)를 업로드받아 Gemini Flash로 통합 분석하고,
     구조화된 데이터를 반환합니다.
     """
     try:
-        image_contents = []
-        for file in files:
-            content = await file.read()
-            image_contents.append(content)
-            
-        result = analyze_job_image(image_contents)
-        return result
-
+        image_contents = [await file.read() for file in files]
+        return analyze_job_image(image_contents)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-from app.schemas.resume_dto import ExperienceExtractionResponse
-from app.services.experience_extraction_service import extract_experiences_from_text, extract_experiences_from_url, extract_experiences_from_pdf
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 자소서 관련 엔드포인트
+# ──────────────────────────────────────────────────────────────────────────────
 
 @router.post("/extract-experiences", response_model=ExperienceExtractionResponse)
 async def extract_experiences(
     file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일"),
     url: Optional[str] = Form(None, description="자소서 웹페이지 URL"),
-    text: Optional[str] = Form(None, description="자소서 텍스트 원문")
+    text: Optional[str] = Form(None, description="자소서 텍스트 원문"),
 ):
     """
-    자소서 원문(PDF, URL, 텍스트 중 하나)을 입력받아, 내재된 경험들을 STAR 포맷으로 구조화하여 추출합니다.
+    자소서 원문(PDF, URL, 텍스트 중 하나)을 입력받아,
+    내재된 경험들을 STAR 포맷으로 구조화하여 추출합니다.
     """
     if not file and not (url and url.strip()) and not (text and text.strip()):
         raise HTTPException(
             status_code=400,
-            detail="file (업로드 파일), url, text 중 최소 하나는 제공되어야 합니다."
+            detail="file (업로드 파일), url, text 중 최소 하나는 제공되어야 합니다.",
         )
 
     try:
@@ -100,14 +117,78 @@ async def extract_experiences(
             file_content = await file.read()
             if file.filename.lower().endswith(".pdf"):
                 return extract_experiences_from_pdf(file_content)
-            else:
-                return extract_experiences_from_text(file_content.decode("utf-8"))
+            return extract_experiences_from_text(file_content.decode("utf-8"))
         elif url and url.strip():
             return extract_experiences_from_url(url.strip())
-        elif text and text.strip():
+        else:
             return extract_experiences_from_text(text.strip())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/extract-experiences/step1", response_model=Step1ExtractionResponse)
+async def extract_experiences_step1(
+    file: Optional[UploadFile] = File(None, description="자소서 원문 PDF 파일"),
+    url: Optional[str] = Form(None, description="자소서 웹페이지 URL"),
+    text: Optional[str] = Form(None, description="자소서 텍스트 원문"),
+):
+    """
+    자소서 원문을 입력받아, 1차 경험 목록(상세 서술형/스펙 증빙형 대분류 및 소분류, 경험명)만 추출합니다.
+    """
+    if not file and not (url and url.strip()) and not (text and text.strip()):
+        raise HTTPException(
+            status_code=400,
+            detail="file (업로드 파일), url, text 중 최소 하나는 제공되어야 합니다.",
+        )
+
+    try:
+        if file and file.filename:
+            file_content = await file.read()
+            if file.filename.lower().endswith(".pdf"):
+                return extract_step1_from_pdf(file_content)
+            return extract_step1_from_text(file_content.decode("utf-8"))
+        elif url and url.strip():
+            return extract_step1_from_url(url.strip())
+        else:
+            return extract_step1_from_text(text.strip())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/extract-experiences/step2", response_model=Step2ExtractionResponse)
+async def extract_experiences_step2(
+    file: Optional[UploadFile] = File(None, description="자소서/포트폴리오 원문 PDF 파일"),
+    url: Optional[str] = Form(None, description="자소서/포트폴리오 웹페이지 URL"),
+    text: Optional[str] = Form(None, description="자소서/포트폴리오 텍스트 원문"),
+    selected_experiences: str = Form(..., description="1차 추출에서 사용자가 남긴 경험 리스트 (JSON 문자열)"),
+):
+    """
+    원문과 사용자가 선택한 1차 경험 목록을 받아, 각 경험의 소분류에 맞는 상세 정보(basic_info)를 추출합니다.
+    """
+    if not file and not (url and url.strip()) and not (text and text.strip()):
+        raise HTTPException(
+            status_code=400,
+            detail="file (업로드 파일), url, text 중 최소 하나는 제공되어야 합니다.",
+        )
+
+    try:
+        raw_experiences = json.loads(selected_experiences)
+        from pydantic import TypeAdapter
+        exp_list = TypeAdapter(List[ExperienceSummary]).validate_python(raw_experiences)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"selected_experiences JSON 파싱 오류: {str(e)}")
+
+    try:
+        if file and file.filename:
+            file_content = await file.read()
+            if file.filename.lower().endswith(".pdf"):
+                return extract_step2_from_pdf(file_content, exp_list)
+            return extract_step2_from_text(file_content.decode("utf-8"), exp_list)
+        elif url and url.strip():
+            return extract_step2_from_url(url.strip(), exp_list)
+        else:
+            return extract_step2_from_text(text.strip(), exp_list)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/analyze-and-place", response_model=PlacementResponse)
 async def analyze_and_place(
@@ -116,71 +197,40 @@ async def analyze_and_place(
     jd_url: Optional[str] = Form(None, description="채용공고 웹페이지 URL (웹 스크래핑용)"),
     experiences_json: str = Form(..., description="사용자 경험 데이터 JSON 문자열"),
     essay_prompts_json: str = Form(..., description="자소서 문항 리스트 JSON 문자열"),
-    user_persona: str = Form("", description="지원자 성향/가치관 (예: '빠른 실행과 피보팅을 중시하는 개발자'). 동적 S/W 프레이밍에 사용됩니다."),
+    user_persona: str = Form("", description="지원자 성향/가치관. 동적 S/W 프레이밍에 사용됩니다."),
 ):
     """
-    JD PDF 혹은 URL 중 하나와, 경험 JSON 목록, 자소서 문항 배열을 받아 LangGraph를 이용해 자소서를 매핑합니다.
+    JD(PDF 또는 URL)와 경험 JSON, 자소서 문항 배열을 받아
+    LangGraph 파이프라인을 통해 최적의 경험을 각 문항에 배치합니다.
     """
-    
-    # [유효성 검사] PDF나 URL 중 최소 하나는 반드시 존재해야 함
+    # [유효성 검사] JD 입력 최소 하나 필수
     if not jd_pdf and not (jd_url and jd_url.strip()):
         raise HTTPException(
-            status_code=400, 
-            detail="jd_pdf (업로드 파일) 또는 jd_url 중 최소 하나는 필수적으로 제공되어야 합니다."
+            status_code=400,
+            detail="jd_pdf (업로드 파일) 또는 jd_url 중 최소 하나는 필수적으로 제공되어야 합니다.",
         )
 
-    # 1. JSON 검증 및 STAR → 내부 포맷 변환
+    # 1. 입력 파싱 및 검증 (서비스 레이어에 위임)
     try:
-        raw_experiences = json.loads(experiences_json)
+        validated_experiences = parse_and_validate_experiences(experiences_json)
         raw_prompts = json.loads(essay_prompts_json)
-
-        validated_experiences = []
-        for exp in raw_experiences:
-            parsed = ExperienceInput(**exp)
-
-            # UUID 자동 생성 (미입력 시)
-            exp_id = parsed.id or str(uuid.uuid4())
-
-            # STAR → LLM용 content 문자열 변환
-            s = parsed.star
-            content = (
-                f"[상황] {s.situation}\n"
-                f"[과제] {s.task}\n"
-                f"[행동] {s.action}\n"
-                f"[결과] {s.result}"
-            )
-
-            validated_experiences.append({
-                "id":       exp_id,
-                "title":    parsed.title,
-                "priority": parsed.priority,
-                "tags":     parsed.tags,
-                "content":  content,       # 내부 LLM 처리용
-                "star":     s.model_dump(), # 원본 보존 (추후 DB 저장용)
-            })
-
         if not isinstance(raw_prompts, list):
             raise ValueError("essay_prompts_json 필드는 문자열 배열 형태여야 합니다.")
-
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="유효하지 않은 JSON 문자열입니다.")
     except (ValidationError, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"입력 데이터 검증 실패: {str(e)}")
 
-
-    # 2. 우선순위 판별 및 처리 
-    # 두 값이 모두 들어올 경우 jd_pdf 분석 결과를 우선 사용
+    # 2. JD 마크다운 추출 (PDF 우선, URL 폴백)
     jd_markdown = ""
     if jd_pdf and jd_pdf.filename:
         jd_content = await jd_pdf.read()
         try:
-            # 실제 서비스시엔 바이너리(jd_content)를 Upstage API에 넘기고 반환된 마크다운을 씁니다.
             jd_markdown = jd_content.decode("utf-8")
         except UnicodeDecodeError:
             jd_markdown = "# JD 텍스트 파싱 처리 (더미 마크다운. 실제론 Upstage API에서 넘어왔다고 가정)"
 
-
-    # 3. LangGraph 상태(State) 설정
+    # 3. LangGraph 초기 State 설정
     initial_state = {
         "jd_markdown": jd_markdown,
         "jd_url": jd_url,
@@ -190,22 +240,22 @@ async def analyze_and_place(
         "jd_context": {},
         "placements": [],
         "remaining_indices": [],
-        "errors": []
+        "errors": [],
     }
 
-    # 4. 워크플로우 실행
+    # 4. LangGraph 워크플로우 실행
     try:
         final_state = workflow.invoke(initial_state)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"내부 파이프라인 실행 중 오류 발생: {str(e)}")
-        
-    # [개선] 한글 유니코드 이스케이프 방지 (ensure_ascii=False 적용)
+
+    # 5. 한글 유니코드 이스케이프 방지 (ensure_ascii=False)
     final_response = PlacementResponse(
         placements=final_state.get("placements", []),
-        errors=final_state.get("errors", [])
+        errors=final_state.get("errors", []),
     ).model_dump()
-    
+
     return Response(
         content=json.dumps(final_response, ensure_ascii=False),
-        media_type="application/json"
+        media_type="application/json",
     )

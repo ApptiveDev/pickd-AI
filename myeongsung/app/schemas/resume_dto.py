@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
+from datetime import datetime
 
 # ── STAR 경험 입력 스키마 ──────────────────────────────────────
 class StarContent(BaseModel):
@@ -54,3 +55,122 @@ class ExtractedExperience(BaseModel):
 
 class ExperienceExtractionResponse(BaseModel):
     experiences: List[ExtractedExperience] = Field(..., description="추출된 경험 후보 목록")
+
+# ── 1차 추출 (경험 분류) 스키마 ──────────────────────────────────────
+class ExperienceSummary(BaseModel):
+    experience_name: str = Field(..., description="경험명 (예: 캡스톤 디자인 프로젝트, 토익 900점 등)")
+    experience_group: str = Field(..., description="경험 대분류 (상세 서술형 또는 스펙·증빙형)")
+    experience_type: str = Field(..., description="경험 소분류 (프로젝트, 어학, 인턴 등)")
+
+class Step1ExtractionResponse(BaseModel):
+    experiences: List[ExperienceSummary] = Field(..., description="1차 추출된 경험 목록")
+
+# ── 2차 추출 (소분류별 맞춤 스키마) ──────────────────────────────────────
+
+# [1] 상세 서술형
+class ProjectInfo(BaseModel):
+    project_name: Optional[str] = Field(None, description="프로젝트명")
+    period: Optional[str] = Field(None, description="진행 기간")
+    role: Optional[str] = Field(None, description="역할")
+    organization: Optional[str] = Field(None, description="소속/팀")
+    achievements: Optional[str] = Field(None, description="주요 성과")
+
+class ActivityInfo(BaseModel):
+    activity_name: Optional[str] = Field(None, description="활동명")
+    organization: Optional[str] = Field(None, description="주관기관")
+    period: Optional[str] = Field(None, description="활동 기간")
+    role: Optional[str] = Field(None, description="역할")
+    achievements: Optional[str] = Field(None, description="주요 성과")
+
+class InternInfo(BaseModel):
+    organization: Optional[str] = Field(None, description="회사/기관명")
+    department: Optional[str] = Field(None, description="직무/부서")
+    period: Optional[str] = Field(None, description="근무/참여 기간")
+    task: Optional[str] = Field(None, description="담당 업무")
+    achievements: Optional[str] = Field(None, description="주요 성과")
+
+class CompetitionInfo(BaseModel):
+    competition_name: Optional[str] = Field(None, description="공모전명")
+    organization: Optional[str] = Field(None, description="주관기관")
+    period: Optional[str] = Field(None, description="참가 기간")
+    role: Optional[str] = Field(None, description="역할")
+    achievements: Optional[str] = Field(None, description="수상/결과")
+
+class VolunteerInfo(BaseModel):
+    activity_name: Optional[str] = Field(None, description="활동명")
+    organization: Optional[str] = Field(None, description="기관/단체")
+    period: Optional[str] = Field(None, description="활동 기간")
+    role: Optional[str] = Field(None, description="역할")
+
+class ExchangeInfo(BaseModel):
+    location: Optional[str] = Field(None, description="국가/도시")
+    organization: Optional[str] = Field(None, description="학교명")
+    period: Optional[str] = Field(None, description="파견 기간")
+    major: Optional[str] = Field(None, description="전공/수강 분야")
+
+# [2] 스펙·증빙형
+class LanguageInfo(BaseModel):
+    exam_name: Optional[str] = Field(None, description="시험명")
+    score: Optional[str] = Field(None, description="점수/등급")
+    exam_date: Optional[str] = Field(None, description="응시일")
+    expiration_date: Optional[str] = Field(None, description="유효기간")
+
+class CertificateInfo(BaseModel):
+    certificate_name: Optional[str] = Field(None, description="자격증명")
+    organization: Optional[str] = Field(None, description="발급기관")
+    acquisition_date: Optional[str] = Field(None, description="취득일")
+    expiration_date: Optional[str] = Field(None, description="유효기간")
+
+class AwardInfo(BaseModel):
+    award_name: Optional[str] = Field(None, description="수상명")
+    organization: Optional[str] = Field(None, description="수여기관")
+    award_date: Optional[str] = Field(None, description="수상일")
+    award_grade: Optional[str] = Field(None, description="수상 구분")
+
+class CourseInfo(BaseModel):
+    course_name: Optional[str] = Field(None, description="과목명")
+    semester: Optional[str] = Field(None, description="이수 학기")
+    credit: Optional[str] = Field(None, description="학점")
+    grade: Optional[str] = Field(None, description="성적")
+    major: Optional[str] = Field(None, description="관련 분야")
+
+class EducationInfo(BaseModel):
+    education_name: Optional[str] = Field(None, description="교육명")
+    organization: Optional[str] = Field(None, description="운영기관")
+    period: Optional[str] = Field(None, description="교육 기간")
+    completion_status: Optional[str] = Field(None, description="수료 여부")
+
+BasicInfoUnion = Union[
+    ProjectInfo, ActivityInfo, InternInfo, CompetitionInfo, VolunteerInfo, ExchangeInfo,
+    LanguageInfo, CertificateInfo, AwardInfo, CourseInfo, EducationInfo
+]
+
+class Step2ExtractedExperience(BaseModel):
+    experience_name: str = Field(..., description="경험명")
+    experience_group: str = Field(..., description="경험 대분류 (상세 서술형/스펙·증빙형)")
+    experience_type: str = Field(..., description="경험 소분류 (프로젝트, 인턴, 자격증 등)")
+    
+    keywords: List[str] = Field(default=[], description="주요 키워드")
+    is_important: bool = Field(default=False, description="중요도 (별표)")
+    
+    progress_status: str = Field(default="현재 진행중", description="진행 여부")
+    needs_merge: bool = Field(default=False, description="병합 필요 여부")
+    unanswered: bool = Field(default=False, description="미답변 여부")
+    has_ai_questions: bool = Field(default=False, description="AI 질문 존재 여부")
+    
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    
+    basic_info: BasicInfoUnion = Field(..., description="유형별 기본 필드")
+    
+    document_editor_content: str = Field(default="", description="문서형 에디터 본문")
+    related_links: List[str] = Field(default=[], description="관련 링크")
+    attachments: List[str] = Field(default=[], description="첨부파일")
+    ai_questions: Optional[List[str]] = Field(default=None, description="AI 질문 목록")
+    ai_sentence_cards: List[str] = Field(default=[], description="AI 문장 카드")
+    
+    merge_candidate_id: Optional[str] = Field(default=None, description="병합 후보 ID")
+    writing_status: str = Field(default="in_progress", description="작성 종료 여부")
+
+class Step2ExtractionResponse(BaseModel):
+    experiences: List[Step2ExtractedExperience] = Field(..., description="2차 추출된 경험 상세 목록")

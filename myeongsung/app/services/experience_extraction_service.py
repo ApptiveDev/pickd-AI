@@ -4,7 +4,69 @@ from bs4 import BeautifulSoup
 import fitz  # PyMuPDF
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from app.schemas.resume_dto import ExperienceExtractionResponse
+from typing import List
+from app.schemas.resume_dto import ExperienceExtractionResponse, Step1ExtractionResponse, ExperienceSummary, Step2ExtractionResponse
+def extract_step1_from_text(text: str) -> Step1ExtractionResponse:
+    """
+    텍스트에서 1차 경험 추출 (상세 증빙형 / 스펙 증빙형 분류 및 경험명 추출)
+    """
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", (
+            "당신은 사용자의 자기소개서(자소서) 또는 이력서 원문에서 경험 목록을 1차적으로 파악하고 분류하는 전문가입니다.\n"
+            "주어진 텍스트에 포함된 모든 경험을 찾아내고, 각각을 대분류(상세 서술형, 스펙·증빙형)와 소분류로 정확히 나누어 반환하세요.\n\n"
+            "### 🚨 엄격한 분류 기준 (반드시 아래의 매핑을 지킬 것):\n"
+            "1. **상세 서술형 (상세 증빙형)**:\n"
+            "   - 오직 이 소분류만 가능: 프로젝트, 대외활동, 인턴/직무경험, 공모전, 봉사활동, 교환학생, 알바, 학부연구생\n"
+            "2. **스펙·증빙형**:\n"
+            "   - 오직 이 소분류만 가능: 어학, 자격증, 수상, 수강과목, 교육 이수\n\n"
+            "발견된 모든 독립된 경험의 이름(experience_name)을 추출하고, 위 매핑 규칙에 어긋나지 않도록 대분류(experience_group)와 소분류(experience_type)를 짝지어 반환하세요."
+        )),
+        ("user", "다음 내용에서 1차 경험 목록을 추출해주세요:\n\n{text}")
+    ])
+    
+    chain = prompt | llm.with_structured_output(Step1ExtractionResponse)
+    
+    try:
+        return chain.invoke({"text": text})
+    except Exception as e:
+        raise ValueError(f"1차 경험 추출 중 오류가 발생했습니다: {str(e)}")
+
+def extract_step1_from_url(url: str) -> Step1ExtractionResponse:
+    try:
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, "html.parser")
+        for script in soup(["script", "style"]):
+            script.decompose()
+            
+        full_text = soup.get_text(separator="\n")
+        lines = (line.strip() for line in full_text.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        full_text = "\n".join(chunk for chunk in chunks if chunk)
+        
+        if not full_text.strip():
+            raise ValueError("URL에서 유의미한 텍스트를 추출하지 못했습니다.")
+            
+        return extract_step1_from_text(full_text)
+    except Exception as e:
+        raise ValueError(f"URL 분석 중 오류가 발생했습니다: {str(e)}")
+
+def extract_step1_from_pdf(file_content: bytes) -> Step1ExtractionResponse:
+    try:
+        doc = fitz.open(stream=file_content, filetype="pdf")
+        text_list = [page.get_text() for page in doc]
+        full_text = "\n".join(text_list)
+        
+        if not full_text.strip():
+            raise ValueError("PDF에서 유의미한 텍스트를 추출하지 못했습니다.")
+            
+        return extract_step1_from_text(full_text)
+    except Exception as e:
+        raise ValueError(f"PDF 분석 중 오류가 발생했습니다: {str(e)}")
+
 
 def extract_experiences_from_text(text: str) -> ExperienceExtractionResponse:
     """
@@ -96,6 +158,80 @@ def extract_experiences_from_pdf(file_content: bytes) -> ExperienceExtractionRes
             raise ValueError("PDF에서 유의미한 텍스트를 추출하지 못했습니다.")
             
         return extract_experiences_from_text(full_text)
+    except Exception as e:
+        raise ValueError(f"PDF 분석 중 오류가 발생했습니다: {str(e)}")
+
+def extract_step2_from_text(text: str, selected_experiences: List[ExperienceSummary]) -> Step2ExtractionResponse:
+    """
+    1차 추출에서 사용자가 선택한 경험 리스트를 바탕으로, 각 경험의 소분류에 맞는 맞춤형 필드를 원문에서 추출합니다.
+    """
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", (
+            "당신은 사용자의 원문 텍스트에서 특정 경험들의 상세 항목을 추출하는 전문가입니다.\n"
+            "사용자가 제공하는 '선택된 경험 목록'에 포함된 각각의 경험에 대하여 원문에서 해당하는 내용을 찾아 지정된 스키마에 맞게 상세 정보를 추출하세요.\n\n"
+            "### 추출 가이드라인:\n"
+            "1. 선택된 경험 목록과 원문을 대조하여, 해당 경험이 언급된 부분을 찾습니다.\n"
+            "2. 각 경험의 `experience_group`과 `experience_type`을 유지하면서, `basic_info` 필드를 해당 타입에 맞게 추출해야 합니다.\n"
+            "   - '상세 서술형' (프로젝트, 대외활동, 인턴/직무경험, 공모전, 봉사활동, 교환학생 등)\n"
+            "   - '스펙·증빙형' (어학, 자격증, 수상, 수강과목, 교육 이수 등)\n"
+            "3. 각 소분류별 스키마에 정의된 정보만 원문에서 추출하며, 원문에서 찾을 수 없는 정보는 null 또는 빈 문자열로 남겨둡니다.\n"
+            "4. `keywords` 필드에는 이 경험을 대표하는 핵심 키워드 2~3개를 도출해 저장하세요.\n"
+        )),
+        ("user", "다음은 원문 텍스트입니다:\n\n<TEXT>\n{text}\n</TEXT>\n\n다음은 상세 내용을 추출해야 할 선택된 경험 목록입니다:\n{selected_experiences}")
+    ])
+    
+    chain = prompt | llm.with_structured_output(Step2ExtractionResponse)
+    
+    selected_exp_dicts = [exp.model_dump() for exp in selected_experiences]
+    
+    try:
+        result = chain.invoke(
+            {
+                "text": text,
+                "selected_experiences": selected_exp_dicts
+            },
+            config={
+                "run_name": "experience-step2-extraction",
+                "tags": ["experience-extraction", "step2"]
+            }
+        )
+        return result
+    except Exception as e:
+        raise ValueError(f"2차 경험 추출 중 오류가 발생했습니다: {str(e)}")
+
+def extract_step2_from_url(url: str, selected_experiences: List[ExperienceSummary]) -> Step2ExtractionResponse:
+    try:
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, "html.parser")
+        for script in soup(["script", "style"]):
+            script.decompose()
+            
+        full_text = soup.get_text(separator="\n")
+        lines = (line.strip() for line in full_text.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        full_text = "\n".join(chunk for chunk in chunks if chunk)
+        
+        if not full_text.strip():
+            raise ValueError("URL에서 유의미한 텍스트를 추출하지 못했습니다.")
+            
+        return extract_step2_from_text(full_text, selected_experiences)
+    except Exception as e:
+        raise ValueError(f"URL 분석 중 오류가 발생했습니다: {str(e)}")
+
+def extract_step2_from_pdf(file_content: bytes, selected_experiences: List[ExperienceSummary]) -> Step2ExtractionResponse:
+    try:
+        doc = fitz.open(stream=file_content, filetype="pdf")
+        text_list = [page.get_text() for page in doc]
+        full_text = "\n".join(text_list)
+        
+        if not full_text.strip():
+            raise ValueError("PDF에서 유의미한 텍스트를 추출하지 못했습니다.")
+            
+        return extract_step2_from_text(full_text, selected_experiences)
     except Exception as e:
         raise ValueError(f"PDF 분석 중 오류가 발생했습니다: {str(e)}")
 
