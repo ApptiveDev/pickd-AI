@@ -5,7 +5,7 @@ import fitz  # PyMuPDF
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from typing import List
-from app.schemas.resume_dto import ExperienceExtractionResponse, Step1ExtractionResponse, ExperienceSummary, Step2ExtractionResponse
+from app.schemas.resume_dto import ExperienceExtractionResponse, Step1ExtractionResponse, ExperienceSummary, Step2ExtractionResponse, Step2ExtractedExperience
 def extract_step1_from_text(text: str) -> Step1ExtractionResponse:
     """
     텍스트에서 1차 경험 추출 (상세 증빙형 / 스펙 증빙형 분류 및 경험명 추출)
@@ -38,14 +38,20 @@ def extract_step1_from_url(url: str) -> Step1ExtractionResponse:
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         response.raise_for_status()
         
-        soup = BeautifulSoup(response.text, "html.parser")
-        for script in soup(["script", "style"]):
-            script.decompose()
-            
-        full_text = soup.get_text(separator="\n")
-        lines = (line.strip() for line in full_text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        full_text = "\n".join(chunk for chunk in chunks if chunk)
+        content_type = response.headers.get("Content-Type", "").lower()
+        if "application/pdf" in content_type or url.lower().split("?")[0].endswith(".pdf"):
+            doc = fitz.open(stream=response.content, filetype="pdf")
+            text_list = [page.get_text() for page in doc]
+            full_text = "\n".join(text_list)
+        else:
+            soup = BeautifulSoup(response.text, "html.parser")
+            for script in soup(["script", "style"]):
+                script.decompose()
+                
+            full_text = soup.get_text(separator="\n")
+            lines = (line.strip() for line in full_text.splitlines())
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            full_text = "\n".join(chunk for chunk in chunks if chunk)
         
         if not full_text.strip():
             raise ValueError("URL에서 유의미한 텍스트를 추출하지 못했습니다.")
@@ -126,14 +132,20 @@ def extract_experiences_from_url(url: str) -> ExperienceExtractionResponse:
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         response.raise_for_status()
         
-        soup = BeautifulSoup(response.text, "html.parser")
-        for script in soup(["script", "style"]):
-            script.decompose()
-            
-        full_text = soup.get_text(separator="\n")
-        lines = (line.strip() for line in full_text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        full_text = "\n".join(chunk for chunk in chunks if chunk)
+        content_type = response.headers.get("Content-Type", "").lower()
+        if "application/pdf" in content_type or url.lower().split("?")[0].endswith(".pdf"):
+            doc = fitz.open(stream=response.content, filetype="pdf")
+            text_list = [page.get_text() for page in doc]
+            full_text = "\n".join(text_list)
+        else:
+            soup = BeautifulSoup(response.text, "html.parser")
+            for script in soup(["script", "style"]):
+                script.decompose()
+                
+            full_text = soup.get_text(separator="\n")
+            lines = (line.strip() for line in full_text.splitlines())
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            full_text = "\n".join(chunk for chunk in chunks if chunk)
         
         if not full_text.strip():
             raise ValueError("URL에서 유의미한 텍스트를 추출하지 못했습니다.")
@@ -164,19 +176,20 @@ def extract_experiences_from_pdf(file_content: bytes) -> ExperienceExtractionRes
 def extract_step2_from_text(text: str, selected_experiences: List[ExperienceSummary]) -> Step2ExtractionResponse:
     """
     1차 추출에서 사용자가 선택한 경험 리스트를 바탕으로, 각 경험의 소분류에 맞는 맞춤형 필드를 원문에서 추출합니다.
+    (TPM 제한 방지를 위해 각 경험별로 개별 추출 후 병합합니다.)
     """
     llm = ChatOpenAI(model="gpt-4o", temperature=0)
     
     prompt = ChatPromptTemplate.from_messages([
         ("system", (
-            "당신은 사용자의 원문 텍스트에서 특정 경험들의 상세 항목을 추출하는 전문가입니다.\n"
-            "사용자가 제공하는 '선택된 경험 목록'에 포함된 각각의 경험에 대하여 원문에서 해당하는 내용을 찾아 지정된 스키마에 맞게 상세 정보를 추출하세요.\n\n"
+            "당신은 사용자의 원문 텍스트에서 특정 경험의 상세 항목을 추출하는 전문가입니다.\n"
+            "사용자가 제공하는 '선택된 경험'에 대하여 원문에서 해당하는 내용을 찾아 지정된 스키마에 맞게 상세 정보를 추출하세요.\n\n"
             "### 추출 가이드라인:\n"
-            "1. 선택된 경험 목록과 원문을 대조하여, 해당 경험이 언급된 부분을 찾습니다.\n"
-            "2. 각 경험의 `experience_group`과 `experience_type`을 유지하면서, `basic_info` 필드를 해당 타입에 맞게 추출해야 합니다.\n"
+            "1. 선택된 경험과 원문을 대조하여, 해당 경험이 언급된 부분을 찾습니다.\n"
+            "2. 경험의 `experience_group`과 `experience_type`을 유지하면서, `basic_info` 필드를 해당 타입에 맞게 추출해야 합니다.\n"
             "   - '상세 서술형' (프로젝트, 대외활동, 인턴/직무경험, 공모전, 봉사활동, 교환학생 등)\n"
             "   - '스펙·증빙형' (어학, 자격증, 수상, 수강과목, 교육 이수 등)\n"
-            "3. 각 소분류별 스키마에 정의된 정보만 원문에서 추출하며, 원문에서 찾을 수 없는 정보는 null 또는 빈 문자열로 남겨둡니다.\n"
+            "3. 해당 소분류별 스키마에 정의된 정보만 원문에서 추출하며, 원문에서 찾을 수 없는 정보는 null 또는 빈 문자열로 남겨둡니다.\n"
             "4. `keywords` 필드에는 다음 **[제공된 역량/태도 키워드 풀]** 내에서만 매핑하여 저장하세요.\n"
             "   - [키워드 풀]: 문제 해결, 창의적 학습, 리더십, 의사소통, 팀워크, 분석력, 실행력, 책임감, 적응력, 꼼꼼함, 도전 정신, 기획력\n"
             "   - 원문의 내용을 냉정하고 객관적으로 판단하여 이 경험을 가장 잘 대표하는 키워드를 1~3개 선택하세요.\n"
@@ -189,41 +202,49 @@ def extract_step2_from_text(text: str, selected_experiences: List[ExperienceSumm
             "   - 허용된 태그: 나의 역할, 문제 상황, 실행 과정, 성과, 수치 성과, 배운 점, 직무 연결성, 협업 방식, 일반 문장\n"
             "   - 🚨 특별 규칙: '스펙·증빙형' (어학, 자격증, 오픽 등) 경험의 경우, 원문에 여러 스펙이 쉼표나 파이프(|) 등으로 나열되어 있더라도, `experience_content`에는 **오직 현재 추출 중인 경험과 관련된 부분(예: 토익 경험이라면 '토익점수 : 850' 등)**만 추출해야 합니다. 나열된 전체 문자열을 그대로 가져오지 마세요.\n"
         )),
-        ("user", "다음은 원문 텍스트입니다:\n\n<TEXT>\n{text}\n</TEXT>\n\n다음은 상세 내용을 추출해야 할 선택된 경험 목록입니다:\n{selected_experiences}")
+        ("user", "다음은 원문 텍스트입니다:\n\n<TEXT>\n{text}\n</TEXT>\n\n다음은 상세 내용을 추출해야 할 선택된 경험입니다:\n{selected_experience}")
     ])
     
-    chain = prompt | llm.with_structured_output(Step2ExtractionResponse)
+    chain = prompt | llm.with_structured_output(Step2ExtractedExperience)
     
-    selected_exp_dicts = [exp.model_dump() for exp in selected_experiences]
-    
-    try:
-        result = chain.invoke(
-            {
-                "text": text,
-                "selected_experiences": selected_exp_dicts
-            },
-            config={
-                "run_name": "experience-step2-extraction",
-                "tags": ["experience-extraction", "step2"]
-            }
-        )
-        return result
-    except Exception as e:
-        raise ValueError(f"2차 경험 추출 중 오류가 발생했습니다: {str(e)}")
+    extracted_experiences = []
+    for exp in selected_experiences:
+        try:
+            result = chain.invoke(
+                {
+                    "text": text,
+                    "selected_experience": exp.model_dump()
+                },
+                config={
+                    "run_name": f"experience-step2-extraction-{exp.experience_name}",
+                    "tags": ["experience-extraction", "step2"]
+                }
+            )
+            extracted_experiences.append(result)
+        except Exception as e:
+            raise ValueError(f"'{exp.experience_name}' 2차 경험 추출 중 오류가 발생했습니다: {str(e)}")
+            
+    return Step2ExtractionResponse(experiences=extracted_experiences)
 
 def extract_step2_from_url(url: str, selected_experiences: List[ExperienceSummary]) -> Step2ExtractionResponse:
     try:
         response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         response.raise_for_status()
         
-        soup = BeautifulSoup(response.text, "html.parser")
-        for script in soup(["script", "style"]):
-            script.decompose()
-            
-        full_text = soup.get_text(separator="\n")
-        lines = (line.strip() for line in full_text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        full_text = "\n".join(chunk for chunk in chunks if chunk)
+        content_type = response.headers.get("Content-Type", "").lower()
+        if "application/pdf" in content_type or url.lower().split("?")[0].endswith(".pdf"):
+            doc = fitz.open(stream=response.content, filetype="pdf")
+            text_list = [page.get_text() for page in doc]
+            full_text = "\n".join(text_list)
+        else:
+            soup = BeautifulSoup(response.text, "html.parser")
+            for script in soup(["script", "style"]):
+                script.decompose()
+                
+            full_text = soup.get_text(separator="\n")
+            lines = (line.strip() for line in full_text.splitlines())
+            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+            full_text = "\n".join(chunk for chunk in chunks if chunk)
         
         if not full_text.strip():
             raise ValueError("URL에서 유의미한 텍스트를 추출하지 못했습니다.")
