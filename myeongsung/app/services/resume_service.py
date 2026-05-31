@@ -2,16 +2,16 @@ import os
 import json
 import time
 import random
-from dotenv import load_dotenv
+import uuid
 from typing import List, Dict, Any, TypedDict, Literal, Optional, Union
 
-# .env 환경변수를 자동으로 불러옵니다.
-load_dotenv()
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, START, END
+
+from app.core.config import GPT_MODEL
+from app.schemas.resume_dto import ExperienceInput
 
 # ==========================================
 # [Fix 2] 간이 캐싱 메모리 (동일 URL 크롤링 회피)
@@ -457,26 +457,76 @@ def sequential_strategic_placer(state: AgentState) -> AgentState:
 # ==========================================
 def create_workflow() -> Any:
     workflow = StateGraph(AgentState)
-    
+
     # 노드 부착
     workflow.add_node("Upstage_Parse_Node", upstage_parse_node)
     workflow.add_node("Cache_Hit_Node", cache_hit_node)
     workflow.add_node("Web_Scraping_Node", web_scraping_node)
-    
+
     workflow.add_node("JD_Structural_Analyzer", jd_structural_analyzer)
     workflow.add_node("SWOT_Strategy_Scorer", swot_strategy_scorer)
     workflow.add_node("Sequential_Strategic_Placer", sequential_strategic_placer)
-    
+
     # 라우팅
     workflow.add_conditional_edges(START, jd_ingestion_router)
-    
+
     # 순차 플로우 연결
     workflow.add_edge("Upstage_Parse_Node", "JD_Structural_Analyzer")
     workflow.add_edge("Cache_Hit_Node", "JD_Structural_Analyzer")
     workflow.add_edge("Web_Scraping_Node", "JD_Structural_Analyzer")
-    
+
     workflow.add_edge("JD_Structural_Analyzer", "SWOT_Strategy_Scorer")
     workflow.add_edge("SWOT_Strategy_Scorer", "Sequential_Strategic_Placer")
     workflow.add_edge("Sequential_Strategic_Placer", END)
-    
+
     return workflow.compile()
+
+
+# ==========================================
+# 5. 입력 파싱 유틸 (Controller에서 이동)
+# ==========================================
+
+def parse_and_validate_experiences(experiences_json: str) -> List[Dict[str, Any]]:
+    """
+    라우터로부터 받은 JSON 문자열을 파싱하고,
+    ExperienceInput 스키마로 검증한 뒤 LLM용 내부 포맷으로 변환합니다.
+
+    Args:
+        experiences_json: ExperienceInput 형식의 JSON 배열 문자열
+
+    Returns:
+        LangGraph State에 바로 주입 가능한 경험 딕셔너리 리스트
+
+    Raises:
+        json.JSONDecodeError: 유효하지 않은 JSON 형식일 때
+        ValidationError: ExperienceInput 스키마 검증 실패 시
+        ValueError: 기타 입력 오류 시
+    """
+    raw_experiences = json.loads(experiences_json)
+
+    validated_experiences = []
+    for exp in raw_experiences:
+        parsed = ExperienceInput(**exp)
+
+        # UUID 자동 생성 (미입력 시)
+        exp_id = parsed.id or str(uuid.uuid4())
+
+        # STAR 항목 → LLM용 content 문자열 변환
+        s = parsed.star
+        content = (
+            f"[상황] {s.situation}\n"
+            f"[과제] {s.task}\n"
+            f"[행동] {s.action}\n"
+            f"[결과] {s.result}"
+        )
+
+        validated_experiences.append({
+            "id":       exp_id,
+            "title":    parsed.title,
+            "priority": parsed.priority,
+            "tags":     parsed.tags,
+            "content":  content,          # 내부 LLM 처리용
+            "star":     s.model_dump(),   # 원본 보존 (추후 DB 저장용)
+        })
+
+    return validated_experiences

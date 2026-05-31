@@ -71,7 +71,7 @@ def _analyze_with_vision(image_url: str, google_api_key: str) -> Optional[JobPos
         image = PIL.Image.open(io.BytesIO(img_response.content))
 
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-2.0-flash',
             contents=[image, _VISION_SYSTEM_PROMPT],
             config=types.GenerateContentConfig(
                 response_mime_type='application/json',
@@ -127,52 +127,74 @@ def _analyze_with_text(markdown: str) -> Optional[JobPostingCreate]:
 # 4. 지능적 병합 엔진
 # ──────────────────────────────────────────────
 
-def _smart_merge(text_result: Optional[JobPostingCreate], 
+def _smart_merge(text_result: Optional[JobPostingCreate],
                  vision_result: Optional[JobPostingCreate]) -> JobPostingCreate:
     """
     텍스트 엔진과 비전 엔진의 결과를 지능적으로 병합.
     원칙: 텍스트 결과를 기본으로 하되, 비전 결과가 더 풍부한 필드는 비전 결과를 채택.
     """
-    try:
-        # 둘 다 없으면 에러
-        if not text_result and not vision_result:
-            raise ValueError("텍스트 분석과 비전 분석 모두 실패했습니다.")
+    # 둘 다 없으면 에러
+    if not text_result and not vision_result:
+        raise ValueError("텍스트 분석과 비전 분석 모두 실패했습니다.")
 
-        # 하나만 있으면 그것을 사용
-        if not text_result:
-            return vision_result
-        if not vision_result:
-            return text_result
+    # 하나만 있으면 그것을 사용
+    if not text_result:
+        return vision_result
+    if not vision_result:
+        return text_result
 
-        merged = text_result.model_copy(deep=True)
+    merged = text_result.model_copy(deep=True)
 
-        # 1. 텍스트 정보가 부족할 수 있는 모집 부문(sections) 보완
-        if vision_result.sections and len(vision_result.sections) > len(merged.sections):
-            merged.sections = vision_result.sections
+    # sections: 비전이 더 많은 부문을 발견했으면 비전 결과 채택
+    if len(vision_result.sections) > len(merged.sections):
+        merged.sections = vision_result.sections
 
-        # 2. 전형 절차(processes) 및 서류(documents) 보완
-        if not merged.processes and vision_result.processes:
-            merged.processes = vision_result.processes
-        if not merged.documents and vision_result.documents:
-            merged.documents = vision_result.documents
+    # processes: 비어있으면 비전에서 가져옴
+    if not merged.processes and vision_result.processes:
+        merged.processes = vision_result.processes
 
-        # 3. 최상위 필드 보완 (기업명, 공고명, 고용형태 등)
-        for field_name in ["company_name", "notice_name", "employment_type", "headcount", "region_1depth", "workplace_address", "notice_url"]:
-            merged_val = getattr(merged, field_name, None)
-            vision_val = getattr(vision_result, field_name, None)
-            if (merged_val is None or merged_val == "" or merged_val == 0) and vision_val:
-                setattr(merged, field_name, vision_val)
+    # documents
+    if not merged.documents and vision_result.documents:
+        merged.documents = vision_result.documents
 
-        # 4. citations 합치기 (중복 제거 및 None 체크)
-        existing_contents = {c.content[:50] for c in merged.citations if c.content}
-        for cit in vision_result.citations:
-            if cit.content and cit.content[:50] not in existing_contents:
-                merged.citations.append(cit)
+    # company_info: 비전이 더 풍부하면 채택
+    if vision_result.company_info:
+        if not merged.company_info:
+            merged.company_info = vision_result.company_info
+        else:
+            # 개별 필드 단위로 보완
+            for field_name in vision_result.company_info.model_fields:
+                vision_val = getattr(vision_result.company_info, field_name, None)
+                merged_val = getattr(merged.company_info, field_name, None)
+                if vision_val and not merged_val:
+                    setattr(merged.company_info, field_name, vision_val)
 
-        return merged
-    except Exception as e:
-        print(f"[!] 결과 병합 중 오류 발생: {e}")
-        return text_result if text_result else vision_result
+    # guideline
+    if vision_result.guideline:
+        if not merged.guideline:
+            merged.guideline = vision_result.guideline
+        else:
+            for field_name in vision_result.guideline.model_fields:
+                vision_val = getattr(vision_result.guideline, field_name, None)
+                merged_val = getattr(merged.guideline, field_name, None)
+                if vision_val and not merged_val:
+                    setattr(merged.guideline, field_name, vision_val)
+
+    # 단순 필드 보완 (비어있으면 비전에서 가져옴)
+    for field_name in ["employment_type", "headcount", "region_1depth", "workplace_address", "notice_url"]:
+        merged_val = getattr(merged, field_name, None)
+        vision_val = getattr(vision_result, field_name, None)
+        if not merged_val and vision_val:
+            setattr(merged, field_name, vision_val)
+
+    # citations 합치기 (중복 제거)
+    existing_contents = {c.content[:50] for c in merged.citations}
+    for cit in vision_result.citations:
+        if cit.content[:50] not in existing_contents:
+            merged.citations.append(cit)
+
+    return merged
+
 
 # ──────────────────────────────────────────────
 # 5. 메인 엔트리포인트
@@ -209,7 +231,7 @@ def analyze_job_url(url: str) -> JobPostingCreate:
     # 3. 비전 엔진 실행 (항상 실행하여 보완)
     vision_result = None
     if screenshot_url and google_api_key:
-        print("[*] 비전 엔진(Gemini 2.5 Flash) 분석 중...")
+        print("[*] 비전 엔진(Gemini 2.0 Flash) 분석 중...")
         vision_result = _analyze_with_vision(screenshot_url, google_api_key)
 
     # 4. 지능적 병합

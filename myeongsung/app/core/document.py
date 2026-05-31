@@ -1,41 +1,81 @@
+"""
+Upstage Document AI 및 OpenAI 기반 문서 분석 유틸리티.
+
+NOTE: 이 모듈은 순수 유틸 함수만 포함합니다.
+    실행 스크립트 코드는 scripts/ 디렉토리 하위 별도 파일로 분리되어 있습니다.
+"""
+
 import requests
 import json
 from openai import OpenAI
 from datetime import datetime
 
-# 1. Upstage Document Parse: 최신 v2.0 JSON 구조에 맞춘 데이터 추출
-def get_ups_content_v2(api_key, filename):
+
+def get_ups_content_v2(api_key: str, filename: str) -> str:
+    """
+    Upstage Document Parse v2 API를 호출하여 PDF/문서에서 텍스트와 HTML 구조를 추출합니다.
+
+    Args:
+        api_key: Upstage API 키
+        filename: 분석할 파일 경로
+
+    Returns:
+        추출된 전체 텍스트 (표는 HTML 구조 보존)
+    """
     url = "https://api.upstage.ai/v1/document-digitization"
     headers = {"Authorization": f"Bearer {api_key}"}
     files = {"document": open(filename, "rb")}
     # 문서의 구조(표, 제목 등)를 보존하기 위해 document-parse 모델 사용
     data = {"ocr": "force", "model": "document-parse"}
-    
+
     print(f"[*] Upstage API를 통해 문서 분석 중: {filename.split('/')[-1]}")
     response = requests.post(url, headers=headers, files=files, data=data)
     result = response.json()
-    
+
     full_content = []
-    
+
     # JSON 내 elements를 순회하며 HTML 구조와 텍스트를 모두 수집
-    for el in result.get('elements', []):
-        category = el.get('category', 'text')
-        content_html = el.get('content', {}).get('html', '')
-        content_text = el.get('content', {}).get('text', '')
-        
+    for el in result.get("elements", []):
+        category = el.get("category", "text")
+        content_html = el.get("content", {}).get("html", "")
+        content_text = el.get("content", {}).get("text", "")
+
         # 표(table)나 제목(heading) 등 구조적 정보가 담긴 HTML을 우선 수집
         if content_html:
             full_content.append(f"<{category}>\n{content_html}\n</{category}>")
         elif content_text:
             full_content.append(content_text)
-                
+
     return "\n\n".join(full_content)
 
-# 2. AI 가점 분석 함수: 복잡한 로직 및 최적화 엔진 탑재
-def analyze_points_advanced(openai_key, context_data, user_certs, target_job="IT 직무"):
+
+def analyze_points_advanced(
+    openai_key: str,
+    context_data: str,
+    user_certs: list[str],
+    target_job: str = "IT 직무",
+) -> dict:
+    """
+    공공기관 채용 공고문을 파싱하여 사용자 자격증에 대한 최적 가점을 산출합니다.
+
+    Args:
+        openai_key: OpenAI API 키
+        context_data: Upstage로 추출한 공고문 텍스트 (HTML/Text 혼합)
+        user_certs: 보유 자격증 목록 (예: ["정보처리기사", "OPic IH"])
+        target_job: 지원 직무명 (기본값: "IT 직무")
+
+    Returns:
+        {
+            "is_score_fixed": bool,
+            "calculated_points": int,
+            "applied_items": [...],
+            "scoring_logic_guide": str,
+            "total_summary": str,
+        }
+    """
     client = OpenAI(api_key=openai_key)
     current_date = datetime.now().strftime("%Y-%m-%d")
-    
+
     prompt = f"""
     당신은 대한민국 공공기관 채용 규정 분석 전문가입니다. 
     제공된 [공고문 데이터]의 복잡한 규칙을 해석하여 [사용자 자격증]에 대한 '최적 가점'을 산출하세요.
@@ -71,53 +111,9 @@ def analyze_points_advanced(openai_key, context_data, user_certs, target_job="IT
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "너는 복잡한 조건문을 정확하게 처리하는 채용 규정 분석 엔진이야. 답변은 오직 JSON으로만 해."},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt},
         ],
-        response_format={"type": "json_object"}
+        response_format={"type": "json_object"},
     )
-    
+
     return json.loads(response.choices[0].message.content)
-
-# --- 메인 실행부 ---
-UPSTAGE_API_KEY = ""
-OPENAI_API_KEY = ""
-
-# AI가 계산할 로직이 가장 많은 자격증 조합
-MY_CERTIFICATES = [
-    "정보처리기사", 
-    "정보처리산업기사", 
-    "한국사능력검정시험 1급", 
-    "ADsP (데이터 분석 준전문가)",
-    "오픽(OPic) IH"
-]
-
-# 1. 문서 데이터 추출
-# 실제 파일 경로에 맞게 수정하세요.
-try:
-    context_data = get_ups_content_v2(UPSTAGE_API_KEY, "/Users/myeongsung/Documents/upstage/한국전력공사.pdf")
-
-    # 2. 분석 실행 (지원 직무를 IT로 가정하여 난이도 상향)
-    print("[*] AI가 가점 규칙을 분석하고 점수를 계산 중입니다...")
-    analysis = analyze_points_advanced(OPENAI_API_KEY, context_data, MY_CERTIFICATES, target_job="IT 소프트웨어 개발")
-
-    # 3. 리포트 출력
-    print("\n" + "="*60)
-    print(f"             [{analysis.get('total_summary', '분석 리포트')}]")
-    print("="*60)
-
-    if analysis['is_score_fixed']:
-        print(f"▶ 최종 확정 점수: {analysis['calculated_points']}점")
-    else:
-        print("▶ 알림: 일부 항목의 점수 확정이 어렵습니다. 가이드를 확인하세요.")
-
-    print("\n[상세 판정 내역]")
-    for item in analysis['applied_items']:
-        status_icon = "✅" if item['status'] == "인정" else "❌"
-        print(f"{status_icon} {item['name']} ({item['category']}) : {item['score']}점")
-        print(f"   └ 비고: {item['note']}")
-
-    print("\n[AI의 논리적 산출 근거]")
-    print(analysis['scoring_logic_guide'])
-
-except Exception as e:
-    print(f"[!] 오류 발생: {e}")
