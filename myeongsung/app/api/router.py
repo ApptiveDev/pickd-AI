@@ -12,7 +12,16 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Background
 from pydantic import ValidationError
 
 from app.schemas.job_dto import JobPostingCreate, UrlAnalysisRequest
-from app.schemas.resume_dto import ExperienceExtractionResponse, PlacementResponse, Step1ExtractionResponse, ExperienceSummary, Step2ExtractionResponse
+from app.schemas.resume_dto import (
+    ExperienceExtractionResponse,
+    MergeCheckRequest,
+    MergeCheckResponse,
+    MergeExperiencePayload,
+    PlacementResponse,
+    Step1ExtractionResponse,
+    ExperienceSummary,
+    Step2ExtractionResponse,
+)
 
 from app.services.resume_service import create_workflow, parse_and_validate_experiences
 from app.services.job_analysis_service import analyze_job_url
@@ -29,6 +38,7 @@ from app.services.experience_extraction_service import (
     extract_step2_from_url,
     extract_step2_from_pdf,
 )
+from app.services.experience_merge_service import apply_merge_results_to_step2, check_merge_candidates
 from app.services.eval_service import log_evaluation
 
 
@@ -165,6 +175,7 @@ async def extract_experiences_step2(
     url: Optional[str] = Form(None, description="자소서/포트폴리오 웹페이지 URL (원문 중 단 하나만 입력해도 됨)"),
     text: Optional[str] = Form(None, description="자소서/포트폴리오 텍스트 원문 (원문 중 단 하나만 입력해도 됨)"),
     selected_experiences: str = Form(..., description="1차 추출에서 사용자가 남긴 경험 리스트 (JSON 문자열)"),
+    existing_experiences: Optional[str] = Form(None, description="현재 사용자의 저장된 경험 전체 (JSON 문자열, 병합 후보 검사 용도)"),
 ):
     """
     원문과 사용자가 선택한 1차 경험 목록을 받아, 각 경험의 소분류에 맞는 상세 정보(basic_info)를 추출합니다.
@@ -186,16 +197,45 @@ async def extract_experiences_step2(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"selected_experiences JSON 파싱 오류: {str(e)}")
 
+    existing_exp_list: List[MergeExperiencePayload] = []
+    if existing_experiences and existing_experiences.strip():
+        try:
+            raw_existing_experiences = json.loads(existing_experiences)
+            from pydantic import TypeAdapter
+            existing_exp_list = TypeAdapter(List[MergeExperiencePayload]).validate_python(raw_existing_experiences)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"existing_experiences JSON 파싱 오류: {str(e)}")
+
     try:
         if file and file.filename:
             file_content = await file.read()
             if file.filename.lower().endswith(".pdf"):
-                return extract_step2_from_pdf(file_content, exp_list)
-            return extract_step2_from_text(file_content.decode("utf-8"), exp_list)
+                result = extract_step2_from_pdf(file_content, exp_list)
+            else:
+                result = extract_step2_from_text(file_content.decode("utf-8"), exp_list)
         elif url and url.strip():
-            return extract_step2_from_url(url.strip(), exp_list)
+            result = extract_step2_from_url(url.strip(), exp_list)
         else:
-            return extract_step2_from_text(text.strip(), exp_list)
+            result = extract_step2_from_text(text.strip(), exp_list)
+
+        result.experiences = apply_merge_results_to_step2(result.experiences, existing_exp_list)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/experiences/merge-check", response_model=MergeCheckResponse)
+async def check_experience_merge(request: MergeCheckRequest):
+    """
+    새 경험 후보와 사용자의 기존 경험 목록을 임베딩 유사도로 비교하여 병합 후보를 반환합니다.
+    """
+    try:
+        return check_merge_candidates(
+            targets=request.targets,
+            existing_experiences=request.existing_experiences,
+            threshold=request.threshold,
+            top_k=request.top_k,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

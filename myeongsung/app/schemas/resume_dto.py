@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union, Any
+from typing import List, Optional, Union, Any, Dict
 from datetime import datetime
 
 # ── STAR 경험 입력 스키마 ──────────────────────────────────────
@@ -176,7 +176,50 @@ class Step2ExtractedExperience(BaseModel):
     ai_sentence_cards: List[str] = Field(default=[], description="AI 문장 카드")
     
     merge_candidate_id: Optional[str] = Field(default=None, description="병합 후보 ID")
+    merge_similarity: Optional[float] = Field(default=None, description="병합 후보와의 임베딩 유사도")
     writing_status: str = Field(default="in_progress", description="작성 종료 여부")
 
 class Step2ExtractionResponse(BaseModel):
     experiences: List[Step2ExtractedExperience] = Field(..., description="2차 추출된 경험 상세 목록")
+
+
+# ── 경험 병합 후보 검사 스키마 ──────────────────────────────────────
+class MergeExperiencePayload(BaseModel):
+    id: Optional[str] = Field(default=None, description="저장된 경험 ID. 신규 후보는 비워둘 수 있음")
+    title: Optional[str] = Field(default=None, description="경험 제목")
+    experience_name: Optional[str] = Field(default=None, description="경험명")
+    experience_group: Optional[str] = Field(default=None, description="경험 대분류")
+    experience_type: Optional[str] = Field(default=None, description="경험 소분류")
+    keywords: List[str] = Field(default=[], description="경험 키워드")
+    attributes: Dict[str, Any] = Field(default={}, description="저장 경험의 속성 JSON")
+    basic_info: Dict[str, Any] = Field(default={}, description="추출 경험의 유형별 기본 정보")
+    document_content: Optional[str] = Field(default=None, description="저장 경험 본문")
+    experience_content: Optional[str] = Field(default=None, description="추출 경험 본문")
+
+
+class MergeCheckRequest(BaseModel):
+    targets: List[MergeExperiencePayload] = Field(..., description="새로 저장하려는 경험 후보")
+    existing_experiences: List[MergeExperiencePayload] = Field(default=[], description="현재 사용자의 저장된 경험 전체")
+    threshold: Optional[float] = Field(default=None, description="병합 필요 판정 임계값")
+    top_k: int = Field(default=1, ge=1, description="target별 반환 후보 수. v1은 1 사용")
+
+
+class MergeCandidate(BaseModel):
+    id: Optional[str] = Field(default=None, description="병합 후보 경험 ID")
+    title: Optional[str] = Field(default=None, description="병합 후보 제목")
+    experience_group: Optional[str] = Field(default=None, description="병합 후보 대분류")
+    experience_type: Optional[str] = Field(default=None, description="병합 후보 소분류")
+    similarity: float = Field(..., description="target과 후보의 코사인 유사도")
+
+
+class MergeCheckResult(BaseModel):
+    target_index: int = Field(..., description="요청 targets 배열 내 index")
+    target_id: Optional[str] = Field(default=None, description="target ID")
+    needs_merge: bool = Field(..., description="병합 필요 여부")
+    merge_candidate_id: Optional[str] = Field(default=None, description="가장 유사한 병합 후보 ID")
+    similarity: Optional[float] = Field(default=None, description="가장 유사한 후보와의 유사도")
+    candidate: Optional[MergeCandidate] = Field(default=None, description="가장 유사한 후보 정보")
+
+
+class MergeCheckResponse(BaseModel):
+    results: List[MergeCheckResult] = Field(..., description="target별 병합 검사 결과")
