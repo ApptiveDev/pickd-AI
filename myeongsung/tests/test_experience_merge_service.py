@@ -20,6 +20,20 @@ class FakeOpenAI:
     embeddings = FakeEmbeddings()
 
 
+class LowSimilarityEmbeddings:
+    def create(self, model, input):
+        return SimpleNamespace(
+            data=[
+                SimpleNamespace(embedding=[1.0, 0.0]),
+                SimpleNamespace(embedding=[0.76, 0.649923]),
+            ]
+        )
+
+
+class LowSimilarityOpenAI:
+    embeddings = LowSimilarityEmbeddings()
+
+
 class ExperienceMergeServiceTest(unittest.TestCase):
 
     def test_check_merge_candidates_marks_similar_target(self):
@@ -110,6 +124,66 @@ class ExperienceMergeServiceTest(unittest.TestCase):
 
         self.assertFalse(response.results[0].needs_merge)
         self.assertIsNone(response.results[0].similarity)
+
+    def test_same_url_marks_merge_even_with_short_content(self):
+        target = MergeExperiencePayload(
+            title="FIn-agent",
+            experience_group="상세 서술형",
+            experience_type="프로젝트",
+            experience_content="https://github.com/tomchaccom/Fin_AI_Agent",
+        )
+        existing = MergeExperiencePayload(
+            id="exp-1",
+            title="Fin-agent",
+            experience_group="상세 서술형",
+            experience_type="공모전",
+            experience_content="프로젝트 링크: https://github.com/tomchaccom/Fin_AI_Agent",
+        )
+
+        response = check_merge_candidates([target], [existing], threshold=0.86, embedding_client=LowSimilarityOpenAI())
+
+        self.assertTrue(response.results[0].needs_merge)
+        self.assertEqual("exp-1", response.results[0].merge_candidate_id)
+
+    def test_similar_name_and_organization_marks_merge(self):
+        target = MergeExperiencePayload(
+            title="FIn-agent",
+            experience_group="상세 서술형",
+            experience_type="프로젝트",
+            basic_info={"organization": "미래에셋"},
+        )
+        existing = MergeExperiencePayload(
+            id="exp-1",
+            title="Fin agent",
+            experience_group="상세 서술형",
+            experience_type="공모전",
+            basic_info={"organization": "미래에셋"},
+        )
+
+        response = check_merge_candidates([target], [existing], threshold=0.86, embedding_client=LowSimilarityOpenAI())
+
+        self.assertTrue(response.results[0].needs_merge)
+        self.assertEqual("exp-1", response.results[0].merge_candidate_id)
+
+    def test_low_embedding_with_two_key_field_matches_marks_merge(self):
+        target = MergeExperiencePayload(
+            title="금융 AI Agent",
+            experience_group="상세 서술형",
+            experience_type="프로젝트",
+            basic_info={"organization": "미래에셋", "period": "2025.06.28 ~ 07.31"},
+        )
+        existing = MergeExperiencePayload(
+            id="exp-1",
+            title="Fin-agent",
+            experience_group="상세 서술형",
+            experience_type="공모전",
+            basic_info={"organization": "미래에셋", "period": "2025.06.28~07.31"},
+        )
+
+        response = check_merge_candidates([target], [existing], threshold=0.86, embedding_client=LowSimilarityOpenAI())
+
+        self.assertTrue(response.results[0].needs_merge)
+        self.assertEqual("exp-1", response.results[0].merge_candidate_id)
 
 
 if __name__ == "__main__":
