@@ -45,3 +45,6 @@ ai_experience_extraction_api_spec.md
 tests/results/
 /*.pdf
 ../.antigravitycli/
+
+# AI harness local-only notes
+docs/ai-harness/*.local.md
