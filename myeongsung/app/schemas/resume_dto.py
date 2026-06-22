@@ -1,6 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-from typing import List, Optional, Union, Any, Dict
 from datetime import datetime
+from typing import List, Optional, Union, Any, Dict
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 PRESET_FIELDS: Dict[str, List[str]] = {
@@ -152,6 +153,20 @@ class ExperienceSummary(BaseModel):
 
 class Step1ExtractionResponse(BaseModel):
     experiences: List[ExperienceSummary] = Field(..., description="1차 추출된 경험 목록")
+
+class PresetFieldDefinition(BaseModel):
+    key: str = Field(..., description="Spring PresetRegistry의 필드 키")
+    label: str = Field(..., description="필드 한글 라벨")
+
+
+class ExperiencePresetSchema(BaseModel):
+    experience_group: str = Field(..., description="경험 대분류 한글명")
+    experience_type: str = Field(..., description="Spring ExperienceType enum 코드")
+    experience_type_name: str = Field(..., description="경험 소분류 한글명")
+    fields: List[PresetFieldDefinition] = Field(
+        default_factory=list,
+        description="해당 경험 유형에서 허용하는 basic_info 필드",
+    )
 
 # ── 2차 추출 (소분류별 맞춤 스키마) ──────────────────────────────────────
 
@@ -309,6 +324,12 @@ class Step2ExtractedExperience(BaseModel):
 
 class Step2ExtractionResponse(BaseModel):
     experiences: List[Step2ExtractedExperience] = Field(..., description="2차 추출된 경험 상세 목록")
+
+class Step2V2ExtractionResponse(BaseModel):
+    experiences: List[Dict[str, Any]] = Field(
+        ...,
+        description="Spring 런타임 프리셋으로 검증된 2차 추출 결과",
+    )
 
 
 # ── 경험 병합 후보 검사 스키마 ──────────────────────────────────────
