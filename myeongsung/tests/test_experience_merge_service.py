@@ -2,7 +2,11 @@ from types import SimpleNamespace
 import unittest
 
 from app.schemas.resume_dto import MergeExperiencePayload, Step2ExtractedExperience
-from app.services.experience_merge_service import build_embedding_text, check_merge_candidates
+from app.services.experience_merge_service import (
+    apply_sequential_merge_results_to_step2,
+    build_embedding_text,
+    check_merge_candidates,
+)
 
 
 class FakeEmbeddings:
@@ -32,6 +36,20 @@ class LowSimilarityEmbeddings:
 
 class LowSimilarityOpenAI:
     embeddings = LowSimilarityEmbeddings()
+
+
+class SameEmbeddings:
+    def create(self, model, input):
+        return SimpleNamespace(
+            data=[
+                SimpleNamespace(embedding=[1.0, 0.0])
+                for _ in input
+            ]
+        )
+
+
+class SameOpenAI:
+    embeddings = SameEmbeddings()
 
 
 class ExperienceMergeServiceTest(unittest.TestCase):
@@ -184,6 +202,35 @@ class ExperienceMergeServiceTest(unittest.TestCase):
 
         self.assertTrue(response.results[0].needs_merge)
         self.assertEqual("exp-1", response.results[0].merge_candidate_id)
+
+    def test_sequential_merge_uses_first_non_duplicate_as_batch_candidate(self):
+        experiences = [
+            {
+                "experience_name": "캡스톤 프로젝트",
+                "experience_group": "상세 서술형",
+                "experience_type": "프로젝트",
+                "basic_info": {"project_name": "캡스톤 프로젝트"},
+                "experience_content": "추천 모델을 개발했습니다.",
+            },
+            {
+                "experience_name": "캡스톤 프로젝트",
+                "experience_group": "상세 서술형",
+                "experience_type": "프로젝트",
+                "basic_info": {"project_name": "캡스톤 프로젝트"},
+                "experience_content": "추천 모델을 개발했습니다.",
+            },
+        ]
+
+        result = apply_sequential_merge_results_to_step2(
+            experiences,
+            [],
+            threshold=0.86,
+            embedding_client=SameOpenAI(),
+        )
+
+        self.assertFalse(result[0]["needs_merge"])
+        self.assertTrue(result[1]["needs_merge"])
+        self.assertEqual("batch:0", result[1]["merge_candidate_id"])
 
 
 if __name__ == "__main__":

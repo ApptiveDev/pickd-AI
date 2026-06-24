@@ -23,6 +23,7 @@ from app.schemas.resume_dto import (
     Step2ExtractionResponse,
 )
 
+from app.api.experience_extraction_v2 import router as experience_extraction_v2_router
 from app.services.resume_service import create_workflow, parse_and_validate_experiences
 from app.services.job_analysis_service import analyze_job_url
 from app.services.pdf_analysis_service import analyze_job_pdf
@@ -38,11 +39,15 @@ from app.services.experience_extraction_service import (
     extract_step2_from_url,
     extract_step2_from_pdf,
 )
-from app.services.experience_merge_service import apply_merge_results_to_step2, check_merge_candidates
+from app.services.experience_merge_service import (
+    apply_merge_results_to_step2,
+    check_merge_candidates,
+)
 from app.services.eval_service import log_evaluation
 
 
 router = APIRouter()
+router.include_router(experience_extraction_v2_router)
 workflow = create_workflow()
 
 

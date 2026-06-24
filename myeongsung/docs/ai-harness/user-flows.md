@@ -56,8 +56,8 @@ Open decisions:
 Confirm any new experience classification types before adding them.
 
 ## Flow: Experience Extraction Step2
-Date: 2026-06-02
-Status: draft
+Date: 2026-06-20
+Status: changed
 
 User action:
 User selects step1 experience candidates for detailed extraction.
@@ -66,22 +66,28 @@ Spring API:
 `POST /api/experiences/extract/step2`.
 
 FastAPI API:
-`POST /api/v1/extract-experiences/step2`.
+`POST /api/v1/extract-experiences/step2` or
+`POST /api/v1/extract-experiences/step2-v2`.
 
 Input source:
-Original file, URL, or text plus `selected_experiences`.
+Original file, URL, or text plus `selected_experiences`. V2 also requires
+Spring `PresetRegistry` schemas and accepts existing experiences.
 
 Service flow:
 FastAPI extracts detailed fields for each selected experience and applies merge candidate detection when existing experiences are provided.
+V2 builds each `basic_info` output model from the runtime preset, rejects undeclared fields,
+and checks each result against existing experiences plus earlier accepted results in selection order.
 
 External APIs:
 May use LLM, embeddings, URL parsing, and document parsing services.
 
 Response:
 Detailed experiences including `basic_info`, keywords, content, and merge metadata.
+Batch-local merge candidates use IDs in the form `batch:{selected_index}` for Spring to resolve.
 
 Failure cases:
-Missing source, invalid `selected_experiences` JSON, invalid existing experience payload, external API failure, timeout.
+Missing source, invalid request JSON, missing or mismatched preset schema, undeclared `basic_info`
+field, external API failure, or timeout.
 
 Spring compatibility:
 Response must remain compatible with Spring `AiStep2Response`.
