@@ -406,3 +406,32 @@ def apply_merge_results_to_step2(
         experience.merge_similarity = result.similarity
 
     return step2_experiences
+
+
+def apply_sequential_merge_results_to_step2(
+    step2_experiences: List[dict],
+    existing_experiences: List[MergeExperiencePayload],
+    threshold: Optional[float] = None,
+    embedding_client: Optional[Any] = None,
+) -> List[dict]:
+    accepted_candidates: List[Any] = list(existing_experiences)
+
+    for index, experience in enumerate(step2_experiences):
+        merge_response = check_merge_candidates(
+            targets=[experience],
+            existing_experiences=accepted_candidates,
+            threshold=threshold,
+            top_k=1,
+            embedding_client=embedding_client,
+        )
+        result = merge_response.results[0]
+        experience["needs_merge"] = result.needs_merge
+        experience["merge_candidate_id"] = result.merge_candidate_id
+        experience["merge_similarity"] = result.similarity
+
+        if not result.needs_merge:
+            accepted_candidate = dict(experience)
+            accepted_candidate["id"] = f"batch:{index}"
+            accepted_candidates.append(accepted_candidate)
+
+    return step2_experiences
