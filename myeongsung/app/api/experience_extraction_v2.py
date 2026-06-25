@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import List, Optional
 
@@ -85,31 +86,36 @@ async def extract_experiences_step2_v2(
         if file and file.filename:
             file_content = await file.read()
             if file.filename.lower().endswith(".pdf"):
-                result = extract_step2_v2_from_pdf(
+                result = await asyncio.to_thread(
+                    extract_step2_v2_from_pdf,
                     file_content,
                     selected_list,
                     preset_list,
                 )
             else:
-                result = extract_step2_v2_from_text(
+                result = await asyncio.to_thread(
+                    extract_step2_v2_from_text,
                     file_content.decode("utf-8"),
                     selected_list,
                     preset_list,
                 )
         elif url and url.strip():
-            result = extract_step2_v2_from_url(
+            result = await asyncio.to_thread(
+                extract_step2_v2_from_url,
                 url.strip(),
                 selected_list,
                 preset_list,
             )
         else:
-            result = extract_step2_v2_from_text(
+            result = await asyncio.to_thread(
+                extract_step2_v2_from_text,
                 text.strip(),
                 selected_list,
                 preset_list,
             )
 
-        result.experiences = apply_sequential_merge_results_to_step2(
+        result.experiences = await asyncio.to_thread(
+            apply_sequential_merge_results_to_step2,
             result.experiences,
             existing_list,
         )

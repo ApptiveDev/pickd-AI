@@ -24,6 +24,52 @@ Follow it before editing code.
 - `tests/`: unit tests for service behavior.
 - `test_api.sh`: manual API smoke checks that may call external APIs.
 
+## Code Change Confirmation Rule
+
+**Before editing any code, always show the problem at code level and get explicit confirmation.**
+
+1. Identify the exact file, function, and line range that has the problem.
+2. Show the current problematic code as a code block.
+3. Explain why it is a problem (performance, correctness, maintainability).
+4. Wait for the user to confirm before making any edits.
+
+Do not skip this step even for small or "obvious" fixes.
+
+## Git and PR Conventions
+
+### Branch naming
+- Basic: `AI/feat/{issue_number}-{description}`
+- Stack PR: `AI/{type}/{issue_number}-{stack_num}/{stack_total}-{description}`
+- Types: `feat`, `fix`, `refactor`, `test`
+
+### Issue title
+`[feat|fix|refactor|test] : {description}`
+Example: `[refactor] : 임베딩 N회 발생 최적화`
+
+### PR title
+`[{issue_number} - Stack {n}/{total}] {description}`
+Example: `[32 - Stack 1/1] 임베딩 N회 발생 최적화`
+
+### PR body template
+```
+## 관련 이슈
+- #{issue_number}
+- Stack PR: {n}/{total}
+- Base: `{base_branch}`
+## 문제
+{problem_description}
+## 작업 내용
+- task 1
+- task 2
+## 테스트
+- test case 1
+- test case 2
+```
+
+### Automation script
+Use `pick/create_pr.sh` for issue creation, branch setup, commit, push, and PR creation.
+See comments at the top of the script for usage.
+
 ## First Step For Every Feature Request
 
 Before implementing, identify and report the likely change scope:

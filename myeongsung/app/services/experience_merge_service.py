@@ -414,22 +414,54 @@ def apply_sequential_merge_results_to_step2(
     threshold: Optional[float] = None,
     embedding_client: Optional[Any] = None,
 ) -> List[dict]:
+    """새 경험들과 기존 경험들을 순차적으로 중복 판정한다.
+
+    기존 구현은 루프마다 check_merge_candidates → _embed_texts(OpenAI API)를 호출해
+    경험 N개 기준으로 API가 N번 발생했다. 이 구현은 시작 전에 전체 텍스트를 한 번만
+    임베딩하고, 이후 비교는 저장된 벡터(코사인 유사도 계산)만으로 수행한다.
+    """
+    if not step2_experiences:
+        return step2_experiences
+
+    effective_threshold = _merge_threshold(threshold)
+
+    # 1. 모든 텍스트를 한 번에 임베딩 (API 호출 1회)
+    all_items: List[Any] = [*step2_experiences, *existing_experiences]
+    all_texts = [build_embedding_text(item) for item in all_items]
+    all_embeddings = _embed_texts(all_texts, client=embedding_client)
+
+    target_embeddings = all_embeddings[: len(step2_experiences)]
+    existing_embeddings = all_embeddings[len(step2_experiences):]
+
+    # 2. sequential 비교 — 벡터 재사용, 추가 API 호출 없음
+    accepted_embeddings: List[List[float]] = list(existing_embeddings)
     accepted_candidates: List[Any] = list(existing_experiences)
 
     for index, experience in enumerate(step2_experiences):
-        merge_response = check_merge_candidates(
-            targets=[experience],
-            existing_experiences=accepted_candidates,
-            threshold=threshold,
-            top_k=1,
-            embedding_client=embedding_client,
-        )
-        result = merge_response.results[0]
-        experience["needs_merge"] = result.needs_merge
-        experience["merge_candidate_id"] = result.merge_candidate_id
-        experience["merge_similarity"] = result.similarity
+        target_vec = target_embeddings[index]
 
-        if not result.needs_merge:
+        scored = [
+            (_cosine_similarity(target_vec, accepted_embeddings[j]), accepted_candidates[j])
+            for j in range(len(accepted_candidates))
+            if _is_comparable(experience, accepted_candidates[j])
+        ]
+
+        if not scored:
+            experience["needs_merge"] = False
+            experience["merge_candidate_id"] = None
+            experience["merge_similarity"] = None
+        else:
+            scored.sort(key=lambda x: x[0], reverse=True)
+            best_similarity, best_candidate = scored[0]
+            needs_merge = _rule_based_merge(
+                experience, best_candidate, best_similarity, effective_threshold
+            )
+            experience["needs_merge"] = needs_merge
+            experience["merge_candidate_id"] = _payload_id(best_candidate) if needs_merge else None
+            experience["merge_similarity"] = best_similarity
+
+        if not experience["needs_merge"]:
+            accepted_embeddings.append(target_vec)
             accepted_candidate = dict(experience)
             accepted_candidate["id"] = f"batch:{index}"
             accepted_candidates.append(accepted_candidate)
