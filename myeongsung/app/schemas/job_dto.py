@@ -87,7 +87,7 @@ class JobPostingBase(BaseModel):
     started_at: str = Field(..., description="접수 시작일 (YYYY-MM-DDTHH:MM:SS)")
     ended_at: Optional[str] = Field(None, description="접수 마감일 (YYYY-MM-DDTHH:MM:SS)")
     notice_url: Optional[str] = Field(None, description="지원 링크")
-    headcount: Optional[int] = Field(0, description="채용 인원")
+    headcount: Optional[str] = Field(None, description="채용 인원 (예: '00명', '0명 이상')")
     region_1depth: Optional[str] = Field(None, description="근무지역")
     workplace_address: Optional[str] = Field(None, description="근무지")
 

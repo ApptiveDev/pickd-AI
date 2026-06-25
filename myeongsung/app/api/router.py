@@ -5,6 +5,7 @@ Resume Strategist API — 라우터 (Controller 레이어)
 비즈니스 로직은 services/ 하위 모듈에서 처리합니다.
 """
 
+import asyncio
 import json
 from typing import Optional, List
 
@@ -62,7 +63,7 @@ async def analyze_url(request: UrlAnalysisRequest, response: Response, backgroun
     분석 완료 후 백그라운드에서 정확도를 평가하고, 응답 헤더에 신뢰도 점수를 포함합니다.
     """
     try:
-        result = analyze_job_url(request.url)
+        result = await asyncio.to_thread(analyze_job_url, request.url)
 
         # 신뢰도 점수 계산 후 헤더에 포함 (Spring 서버에서 확인 가능)
         confidence_score = sum([
@@ -89,7 +90,7 @@ async def analyze_pdf(file: UploadFile = File(...)):
     """
     try:
         file_content = await file.read()
-        return analyze_job_pdf(file_content)
+        return await asyncio.to_thread(analyze_job_pdf, file_content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -102,7 +103,7 @@ async def analyze_image(files: List[UploadFile] = File(...)):
     """
     try:
         image_contents = [await file.read() for file in files]
-        return analyze_job_image(image_contents)
+        return await asyncio.to_thread(analyze_job_image, image_contents)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -134,12 +135,12 @@ async def extract_experiences(
         if file and file.filename:
             file_content = await file.read()
             if file.filename.lower().endswith(".pdf"):
-                return extract_experiences_from_pdf(file_content)
-            return extract_experiences_from_text(file_content.decode("utf-8"))
+                return await asyncio.to_thread(extract_experiences_from_pdf, file_content)
+            return await asyncio.to_thread(extract_experiences_from_text, file_content.decode("utf-8"))
         elif url and url.strip():
-            return extract_experiences_from_url(url.strip())
+            return await asyncio.to_thread(extract_experiences_from_url, url.strip())
         else:
-            return extract_experiences_from_text(text.strip())
+            return await asyncio.to_thread(extract_experiences_from_text, text.strip())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -165,12 +166,12 @@ async def extract_experiences_step1(
         if file and file.filename:
             file_content = await file.read()
             if file.filename.lower().endswith(".pdf"):
-                return extract_step1_from_pdf(file_content)
-            return extract_step1_from_text(file_content.decode("utf-8"))
+                return await asyncio.to_thread(extract_step1_from_pdf, file_content)
+            return await asyncio.to_thread(extract_step1_from_text, file_content.decode("utf-8"))
         elif url and url.strip():
-            return extract_step1_from_url(url.strip())
+            return await asyncio.to_thread(extract_step1_from_url, url.strip())
         else:
-            return extract_step1_from_text(text.strip())
+            return await asyncio.to_thread(extract_step1_from_text, text.strip())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -215,15 +216,15 @@ async def extract_experiences_step2(
         if file and file.filename:
             file_content = await file.read()
             if file.filename.lower().endswith(".pdf"):
-                result = extract_step2_from_pdf(file_content, exp_list)
+                result = await asyncio.to_thread(extract_step2_from_pdf, file_content, exp_list)
             else:
-                result = extract_step2_from_text(file_content.decode("utf-8"), exp_list)
+                result = await asyncio.to_thread(extract_step2_from_text, file_content.decode("utf-8"), exp_list)
         elif url and url.strip():
-            result = extract_step2_from_url(url.strip(), exp_list)
+            result = await asyncio.to_thread(extract_step2_from_url, url.strip(), exp_list)
         else:
-            result = extract_step2_from_text(text.strip(), exp_list)
+            result = await asyncio.to_thread(extract_step2_from_text, text.strip(), exp_list)
 
-        result.experiences = apply_merge_results_to_step2(result.experiences, existing_exp_list)
+        result.experiences = await asyncio.to_thread(apply_merge_results_to_step2, result.experiences, existing_exp_list)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -235,11 +236,12 @@ async def check_experience_merge(request: MergeCheckRequest):
     새 경험 후보와 사용자의 기존 경험 목록을 임베딩 유사도로 비교하여 병합 후보를 반환합니다.
     """
     try:
-        return check_merge_candidates(
-            targets=request.targets,
-            existing_experiences=request.existing_experiences,
-            threshold=request.threshold,
-            top_k=request.top_k,
+        return await asyncio.to_thread(
+            check_merge_candidates,
+            request.targets,
+            request.existing_experiences,
+            request.threshold,
+            request.top_k,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -267,7 +269,7 @@ async def analyze_and_place(
 
     # 1. 입력 파싱 및 검증 (서비스 레이어에 위임)
     try:
-        validated_experiences = parse_and_validate_experiences(experiences_json)
+        validated_experiences = await asyncio.to_thread(parse_and_validate_experiences, experiences_json)
         raw_prompts = json.loads(essay_prompts_json)
         if not isinstance(raw_prompts, list):
             raise ValueError("essay_prompts_json 필드는 문자열 배열 형태여야 합니다.")
@@ -300,7 +302,7 @@ async def analyze_and_place(
 
     # 4. LangGraph 워크플로우 실행
     try:
-        final_state = workflow.invoke(initial_state)
+        final_state = await asyncio.to_thread(workflow.invoke, initial_state)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"내부 파이프라인 실행 중 오류 발생: {str(e)}")
 
